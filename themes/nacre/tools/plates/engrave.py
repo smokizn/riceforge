@@ -346,19 +346,28 @@ def ink_on(img, mask, colour, strength=1.0):
     return img * (1 - m) + colour * m
 
 
-def plate_mark(img, inset=26, colour=None, caption=None, credit=None, family=None):
-    """the plate's pressed border, caption and credit line."""
+def plate_mark(img, inset=26, colour=None, caption=None, credit=None, family=None, inset_top=64):
+    """the plate's pressed border, caption and credit line.
+
+    inset_top keeps the top edge of the frame below the bar (50px + margin),
+    so the engraved rules never run behind it.
+    """
     h, w = img.shape[:2]
     v = Vec(w, h)
     v.cr.set_line_width(1.0)
-    v.cr.rectangle(inset + 0.5, inset + 0.5, w - 2 * inset - 1, h - 2 * inset - 1); v.cr.stroke()
+    v.cr.rectangle(inset + 0.5, inset_top + 0.5, w - 2 * inset - 1, h - inset - inset_top - 1); v.cr.stroke()
     v.cr.set_line_width(0.6)
-    v.cr.rectangle(inset + 5.5, inset + 5.5, w - 2 * inset - 11, h - 2 * inset - 11); v.cr.stroke()
+    v.cr.rectangle(inset + 5.5, inset_top + 5.5, w - 2 * inset - 11, h - inset - inset_top - 11); v.cr.stroke()
     if caption:
         v.text(caption, inset + 24, h - inset - 20, 15, family, spacing=2.2)
     if credit:
         v.text(credit, w - inset - 24, h - inset - 20, 12, family, anchor="right", slant=True)
-    return ink_on(img, v.mask(), colour if colour is not None else STONE_RULE, 0.9)
+    # the frame passes behind the engraving: figures break out of the plate
+    # use the engraving's region, not single pixels: line art has dark gaps
+    lum = img.mean(axis=2)
+    occupied = blur(np.clip((lum - 40) / 40, 0, 1), 7)
+    behind = 1 - np.clip(occupied * 4, 0, 1)
+    return ink_on(img, v.mask() * behind, colour if colour is not None else STONE_RULE, 0.9)
 
 
 STONE_RULE = np.array([96, 92, 86], np.float32)
