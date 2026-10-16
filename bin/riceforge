@@ -91,7 +91,9 @@ cmd_verify() {
     if [[ -f "$d/session" ]]; then bash -n "$d/session" && note "session hook parses"; fi
     if [[ -d "$d/icons" ]]; then
         local bad=0 f
-        for f in "$d"/icons/*.svg; do rsvg-convert "$f" >/dev/null 2>&1 || { echo "bad svg: $f" >&2; bad=1; }; done
+        while IFS= read -r -d '' f; do
+            rsvg-convert "$f" >/dev/null 2>&1 || { echo "bad svg: $f" >&2; bad=1; }
+        done < <(find "$d/icons" -name '*.svg' -print0)
         (( bad )) && die "icon set has invalid svg" || note "icons render"
     fi
     if [[ -d "$RF/shell" ]]; then

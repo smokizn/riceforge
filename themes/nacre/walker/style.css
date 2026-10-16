@@ -1,207 +1,213 @@
-/* NACRE · walker
- * A pane of curved glass hovering over the desktop. The search field is
- * a well pressed into the glass; the selected row is a soft lit lens that
- * lifts slightly toward you. Blur comes from Hyprland (layer rule +
- * walker's own ext-background-effect request); everything else is CSS.
+/* NACRE · Visionary · walker
+ * A leaf from an astronomical manuscript, floating on ink glass: a brass sun
+ * and the word INVOCATIO at the head, an engraved double rule, a search line
+ * written in serif, results set like an index. The chosen entry is marked
+ * the way a scribe would: a brass rule in the margin and a warm wash.
  */
 
-@define-color smoke    #17181d;
-@define-color pearl    #d9d9e0;
-@define-color silver   #aeb0bc;
-@define-color mist     #777a88;
-@define-color lavender #a39cc4;
-@define-color ice      #8ea6bf;
-@define-color rose     #c4919d;
+@define-color ink       #0b0a0a;
+@define-color charcoal  #151413;
+@define-color graphite  #2a2826;
+@define-color stone     #6e6a64;
+@define-color silver    #b9bcc2;
+@define-color bone      #e6dfcf;
+@define-color parchment #d6cbb2;
+@define-color brass     #b39a5e;
+@define-color crimson   #a8464f;
 
-@define-color window_bg_color #17181d;
-@define-color accent_bg_color #a39cc4;
-@define-color theme_fg_color  #d9d9e0;
-@define-color error_bg_color  #c4919d;
-@define-color error_fg_color  #17131a;
+@define-color window_bg_color #151413;
+@define-color accent_bg_color #b39a5e;
+@define-color theme_fg_color  #d6cbb2;
+@define-color error_bg_color  #a8464f;
+@define-color error_fg_color  #e6dfcf;
 
 * {
   all: unset;
   font-family: "Adwaita Sans", "Inter", sans-serif;
+  color: @parchment;
 }
 
-/* the pane */
+/* the leaf */
 .box-wrapper {
-  background-color: alpha(@smoke, 0.60);
-  background-image: linear-gradient(172deg,
-      alpha(white, 0.13) 0%, alpha(white, 0.035) 32%,
-      alpha(white, 0.0) 58%, alpha(@lavender, 0.05) 100%);
-  border: 1px solid alpha(white, 0.10);
-  border-top-color: alpha(white, 0.30);
-  border-bottom-color: alpha(white, 0.05);
-  border-radius: 30px;
-  padding: 16px 16px 12px 16px;
-  /* kept under Hyprland's ignore_alpha so the shadow doesn't drag blur with it */
+  background-color: alpha(@charcoal, 0.86);
+  background-image: linear-gradient(176deg, alpha(@bone, 0.07), alpha(@bone, 0.0) 30%,
+                                             alpha(@bone, 0.0) 82%, alpha(@brass, 0.04));
+  border: 1px solid alpha(@silver, 0.32);
+  border-radius: 20px;
+  padding: 18px 20px 14px 20px;
   box-shadow:
-    inset 0 1px alpha(white, 0.12),
-    0 28px 70px alpha(#05050c, 0.26),
-    0 6px 18px alpha(#05050c, 0.24);
+    inset 0 0 0 6px alpha(@ink, 0.0),
+    inset 0 0 0 7px alpha(@silver, 0.10),          /* the plate mark */
+    0 26px 64px alpha(black, 0.28),
+    0 6px 18px alpha(black, 0.26);
 }
 
-/* the search well */
-.search-container {
-  border-radius: 20px;
+/* ☉ INVOCATIO ☾ */
+.v-header { margin: 0 4px 6px 4px; }
+.v-title {
+  font-family: "Cormorant SC", "Cormorant", "Noto Serif", serif;
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: @brass;
 }
+.v-hint {
+  font-family: "Iosevka Nerd Font Mono", monospace;
+  font-size: 10.5px;
+  color: @stone;
+  margin-right: 6px;
+}
+.v-rule {
+  min-height: 4px;
+  margin: 0 0 12px 0;
+  border-top: 1px solid alpha(@silver, 0.35);
+  border-bottom: 1px solid alpha(@silver, 0.14);
+}
+
+/* the search line, written in serif */
+.search-container { border-radius: 12px; }
 .input {
-  color: @pearl;
-  caret-color: @lavender;
-  font-size: 19px;
+  font-family: "Cormorant", "Noto Serif", serif;
+  font-size: 22px;
   font-weight: 500;
-  padding: 14px 20px;
-  border-radius: 20px;
-  background-color: alpha(#05050c, 0.26);
-  border: 1px solid alpha(white, 0.04);
-  border-bottom-color: alpha(white, 0.12);   /* light catching the lower lip */
-  box-shadow: inset 0 2px 6px alpha(#05050c, 0.35);
-  transition: background-color 200ms ease, box-shadow 260ms ease;
+  color: @bone;
+  caret-color: @brass;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background-color: alpha(@ink, 0.55);
+  border: 1px solid alpha(@silver, 0.16);
+  box-shadow: inset 0 2px 6px alpha(black, 0.35);
+  transition: border-color 200ms ease;
 }
-.input:focus-within {
-  background-color: alpha(#05050c, 0.32);
-  box-shadow: inset 0 2px 6px alpha(#05050c, 0.35), 0 0 0 1px alpha(@lavender, 0.22);
-}
-.input placeholder { color: @mist; }
-.input selection { background-color: alpha(@lavender, 0.40); color: white; }
+.input:focus-within { border-color: alpha(@brass, 0.6); }
+.input placeholder { color: @stone; font-style: italic; }
+.input selection { background-color: alpha(@brass, 0.38); color: @bone; }
 
 .content-container { margin-top: 10px; }
-.list { color: @pearl; }
+.list { color: @parchment; }
 scrollbar { opacity: 0; }
 
 .normal-icons { -gtk-icon-size: 20px; }
-.large-icons  { -gtk-icon-size: 32px; }
+.large-icons  { -gtk-icon-size: 30px; }
 
-/* rows */
+/* index rows */
 .item-box {
-  padding: 9px 14px;
+  padding: 8px 12px;
   margin: 1px 2px;
-  border-radius: 18px;
-  border: 1px solid transparent;
-  transition: background-color 180ms ease,
-              box-shadow 220ms ease,
-              border-color 220ms ease,
-              transform 340ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 10px;
+  border-left: 2px solid transparent;
+  transition: background-color 160ms ease, border-color 200ms ease,
+              transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-child:hover .item-box,
-row:hover .item-box {
-  background-color: alpha(white, 0.045);
-}
+child:hover .item-box, row:hover .item-box { background-color: alpha(@bone, 0.04); }
 .item-image { margin-right: 6px; }
-.item-text {
-  font-size: 14.5px;
-  font-weight: 500;
-  color: @pearl;
-}
-.item-subtext {
-  font-size: 12px;
-  color: @mist;
-}
+.item-text { font-size: 14px; font-weight: 500; color: @bone; }
+.item-subtext { font-size: 11.5px; color: @stone; }
 
-/* the selected row: a lit lens, not a flat highlight */
+/* the scribe's mark on the chosen entry */
 child:selected .item-box,
 row:selected .item-box {
-  background-color: alpha(white, 0.07);
-  background-image: linear-gradient(100deg, alpha(@lavender, 0.24), alpha(@ice, 0.10) 70%, alpha(@ice, 0.04));
-  border-color: alpha(white, 0.10);
-  border-top-color: alpha(white, 0.26);
-  box-shadow: inset 0 1px alpha(white, 0.16), 0 6px 16px alpha(#05050c, 0.22);
-  transform: scale(1.012);
+  background-color: alpha(@brass, 0.10);
+  background-image: linear-gradient(90deg, alpha(@brass, 0.14), alpha(@brass, 0.0) 70%);
+  border-left-color: @brass;
+  transform: translateX(3px);
 }
 child:selected .item-subtext,
-row:selected .item-subtext {
-  color: @silver;
-}
+row:selected .item-subtext { color: @parchment; }
 
-.item-image-text { font-size: 26px; }
-
-/* F1–F4 */
-.item-quick-activation {
+/* provider tags (file, calc, clip, symbol …) */
+.item-tag {
+  font-family: "Cormorant SC", "Cormorant", "Noto Serif", serif;
   font-size: 11px;
-  font-weight: 600;
-  color: @mist;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background-color: alpha(white, 0.05);
+  letter-spacing: 2px;
+  color: @stone;
+  padding: 0 8px;
+  margin-right: 6px;
+  border-left: 1px solid alpha(@silver, 0.18);
+}
+child:selected .item-tag, row:selected .item-tag { color: @brass; }
+
+.item-image-text { font-size: 26px; color: @bone; }
+
+.item-quick-activation {
+  font-family: "Iosevka Nerd Font Mono", monospace;
+  font-size: 10.5px;
+  color: @stone;
+  padding: 1px 7px;
+  border-radius: 6px;
+  border: 1px solid alpha(@silver, 0.16);
 }
 child:selected .item-quick-activation,
-row:selected .item-quick-activation {
-  color: @pearl;
-  background-color: alpha(white, 0.12);
-}
+row:selected .item-quick-activation { color: @brass; border-color: alpha(@brass, 0.5); }
 
 .providerlist .item-subtext { color: @silver; }
 
-/* = calc: the answer, large */
+/* = calc: the answer, set large */
 .calc .item-text {
-  font-family: "Mona Sans", "Adwaita Sans", sans-serif;
-  font-size: 28px;
+  font-family: "Cormorant", "Noto Serif", serif;
+  font-size: 30px;
   font-weight: 600;
+  color: @bone;
 }
-.calc .item-subtext { color: @mist; }
+.calc .item-subtext { color: @stone; }
 
 .symbols .item-image,
 .symbols .item-image-text { font-size: 22px; }
 
 .todo.done .item-text-box { opacity: 0.35; }
-.todo.urgent .item-text    { color: @rose; }
+.todo.urgent .item-text    { color: @crimson; }
 .todo.active               { font-weight: bold; }
 .bluetooth.disconnected    { opacity: 0.5; }
-:not(.calc).current .item-text { color: @lavender; }
+:not(.calc).current .item-text { color: @brass; }
 
 .placeholder,
 .elephant-hint {
-  color: @mist;
-  font-size: 14px;
+  font-family: "Cormorant", "Noto Serif", serif;
+  font-style: italic;
+  font-size: 16px;
+  color: @stone;
 }
 
 .preview {
-  border-radius: 20px;
+  border-radius: 12px;
   padding: 12px;
-  color: @silver;
-  background-color: alpha(#05050c, 0.22);
-  border: 1px solid alpha(white, 0.06);
+  color: @parchment;
+  background-color: alpha(@ink, 0.5);
+  border: 1px solid alpha(@silver, 0.14);
 }
 .preview .large-icons { -gtk-icon-size: 64px; }
 .preview-content.archlinuxpkgs,
 .preview-content.dnfpackages,
-.preview-content.aptpackages {
-  font-family: "Monaspace Neon", "Adwaita Mono", monospace;
-}
+.preview-content.aptpackages { font-family: "Iosevka Nerd Font Mono", monospace; }
 
-/* footer */
+/* colophon */
 .keybinds {
   padding-top: 10px;
   margin-top: 4px;
-  border-top: 1px solid alpha(white, 0.06);
-  font-size: 11.5px;
-  color: @mist;
+  border-top: 1px solid alpha(@silver, 0.12);
+  font-size: 11px;
+  color: @stone;
 }
-.keybind-button       { opacity: 0.8; transition: opacity 160ms ease; }
-.keybind-button:hover { opacity: 1; color: @pearl; }
-.keybind-bind         { color: @mist; text-transform: lowercase; }
+.keybind-button       { opacity: 0.85; transition: opacity 160ms ease; }
+.keybind-button:hover { opacity: 1; color: @bone; }
+.keybind-bind         { color: @stone; text-transform: lowercase; }
 .keybind-label {
-  padding: 2px 8px;
-  border-radius: 999px;
-  background-color: alpha(white, 0.06);
-  color: @silver;
+  padding: 1px 7px;
+  border-radius: 6px;
+  border: 1px solid alpha(@silver, 0.18);
+  color: @parchment;
 }
 
-/* actions submenu */
 popover {
-  background-color: alpha(@smoke, 0.92);
-  background-image: linear-gradient(to bottom, alpha(white, 0.08), alpha(white, 0.0) 45%);
-  border: 1px solid alpha(white, 0.10);
-  border-top-color: alpha(white, 0.26);
-  border-radius: 22px;
+  background-color: alpha(@charcoal, 0.95);
+  border: 1px solid alpha(@silver, 0.28);
+  border-radius: 14px;
   padding: 8px;
-  box-shadow: 0 16px 40px alpha(#05050c, 0.45);
+  box-shadow: 0 16px 40px alpha(black, 0.45);
 }
 
 .error {
   padding: 10px 14px;
-  background-color: alpha(@rose, 0.85);
-  color: #17131a;
-  border-radius: 16px;
+  background-color: alpha(@crimson, 0.85);
+  color: @bone;
+  border-radius: 10px;
 }

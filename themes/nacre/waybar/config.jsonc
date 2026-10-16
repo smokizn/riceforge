@@ -1,9 +1,10 @@
-// NACRE · floating glass islands
-// left: orb + liquid workspace track · centre: the clock droplet · right: one control slab and satellites
+// NACRE · Visionary · the bar as an astronomer's rule
+// left: sigil + constellation of workspaces · centre: the engraved clock plaque
+// right: instruments · connections (real panels) · senses · vial · tray · power
 {
     "layer": "top",
     "position": "top",
-    "height": 46,
+    "height": 50,
     "margin-top": 2,
     "margin-left": 4,
     "margin-right": 4,
@@ -16,12 +17,14 @@
         "custom/hb"
     ],
     "modules-center": [
-        "custom/spotify",
-        "clock"
+        "group/plaque",
+        "custom/spotify"
     ],
     "modules-right": [
         "group/system",
-        "group/controls",
+        "group/connections",
+        "group/senses",
+        "battery",
         "tray",
         "custom/power-menu"
     ],
@@ -29,20 +32,20 @@
     // ── left ──────────────────────────────────────────────
     "group/nav": {
         "orientation": "horizontal",
-        "modules": ["custom/orb", "hyprland/workspaces"]
+        "modules": ["custom/sigil", "hyprland/workspaces"]
     },
 
-    "custom/orb": {
-        "format": "",
-        "tooltip-format": "Walker",
+    "custom/sigil": {
+        "format": " ",
+        "tooltip-format": "Walker (right-click: providers)",
         "on-click": "walker",
         "on-click-right": "walker -m providerlist"
     },
 
-    // dots; the active one stretches into a liquid lozenge (see style.css)
+    // stars on a hairline; the icon comes from CSS by state
     "hyprland/workspaces": {
         "format": "{icon}",
-        "format-icons": { "default": "" },
+        "format-icons": { "default": " " },
         "all-outputs": true,
         "sort-by-number": true,
         "persistent-workspaces": { "*": 5 }
@@ -78,28 +81,41 @@
         "signal": 8
     },
 
-    // ── centre ────────────────────────────────────────────
+    // ── centre: the plaque ────────────────────────────────
+    "group/plaque": {
+        "orientation": "horizontal",
+        "modules": ["custom/moon", "clock"]
+    },
+
+    // the moon's real phase (computed locally, once an hour); click: the ephemeris
+    "custom/moon": {
+        "exec": "python3 -I ~/.config/riceforge/shell/moonphase.py",
+        "return-type": "json",
+        "interval": 3600,
+        "format": "{}",
+        "on-click": "~/.config/riceforge/shell/riceforge-shell moon"
+    },
+
     "clock": {
         "interval": 30,
-        "format": "<span weight='600'>{0:%H:%M}</span><span size='78%' alpha='55%'>   {0:%a %d}</span>",
-        "format-alt": "<span weight='600'>{0:%A}</span><span size='78%' alpha='55%'>   {0:%d %B %Y}</span>",
+        "format": "<span weight='600'>{0:%H:%M}</span><span size='72%' alpha='60%'>   {0:%a · %d %b}</span>",
+        "format-alt": "<span weight='600'>{0:%A}</span><span size='72%' alpha='60%'>   {0:%d %B %Y}</span>",
         "tooltip-format": "<tt>{calendar}</tt>",
         "calendar": {
             "mode": "month",
             "weeks-pos": "",
             "format": {
-                "months":   "<span color='#d9d9e0'><b>{}</b></span>",
-                "weekdays": "<span color='#777a88'>{}</span>",
-                "days":     "<span color='#aeb0bc'>{}</span>",
-                "today":    "<span color='#a39cc4'><b>{}</b></span>"
+                "months":   "<span color='#e6dfcf'><b>{}</b></span>",
+                "weekdays": "<span color='#6e6a64'>{}</span>",
+                "days":     "<span color='#d6cbb2'>{}</span>",
+                "today":    "<span color='#b39a5e'><b><u>{}</u></b></span>"
             }
         }
     },
 
-    // only visible while spotify has something to say
     "custom/spotify": {
         "exec": "python3 ~/.config/waybar/scripts/mediaplayer.py --player spotify",
-        "format": "󰎈  {}",
+        "format": "{}",
         "max-length": 38,
         "return-type": "json",
         "on-click": "playerctl --player=spotify play-pause",
@@ -109,7 +125,6 @@
     },
 
     // ── right ─────────────────────────────────────────────
-    // cpu is the satellite's face; hover pours out memory and the fan
     "group/system": {
         "orientation": "inherit",
         "drawer": {
@@ -122,12 +137,13 @@
 
     "cpu": {
         "interval": 5,
-        "format": "󰻠  {usage}%"
+        "format": "{usage}%",
+        "tooltip-format": "CPU {usage}% · hover to open the instruments"
     },
 
     "memory": {
         "interval": 10,
-        "format": "󰍛  {percentage}%",
+        "format": "{percentage}%",
         "tooltip-format": "{used:0.1f} / {total:0.1f} GiB"
     },
 
@@ -139,29 +155,55 @@
     },
 
     "custom/fan": {
-        "format": "󰈐",
+        "format": " ",
         "on-click": "python3 ~/.config/hypr/hyprland/scripts/fan_toggle.py",
         "tooltip-format": "Toggle fan: auto / max"
     },
 
-    "group/controls": {
+    "group/connections": {
         "orientation": "horizontal",
-        "modules": ["pulseaudio", "custom/mic-toggle", "backlight", "bluetooth", "battery"]
+        "modules": ["network", "bluetooth"]
+    },
+
+    // NetworkManager-backed and event driven; click opens the real Wi-Fi panel
+    "network": {
+        "interval": 60,
+        "format-wifi": "{essid}",
+        "format-ethernet": "wired",
+        "format-linked": "no address",
+        "format-disconnected": "offline",
+        "format-disabled": "radio off",
+        "max-length": 18,
+        "tooltip-format-wifi": "{essid} · {signalStrength}% · {frequency} GHz\n{ipaddr} on {ifname}",
+        "tooltip-format-ethernet": "{ifname} · {ipaddr}",
+        "tooltip-format-disconnected": "Not connected · click to choose a network",
+        "on-click": "~/.config/riceforge/shell/riceforge-shell wifi",
+        "on-click-right": "nm-connection-editor"
+    },
+
+    "bluetooth": {
+        "format": "on",
+        "format-off": "off",
+        "format-disabled": "off",
+        "format-connected": "{device_alias}",
+        "format-connected-battery": "{device_alias} {device_battery_percentage}%",
+        "max-length": 16,
+        "tooltip-format": "{controller_alias} · {status}",
+        "tooltip-format-connected": "{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
+        "tooltip-format-enumerate-connected-battery": "{device_alias} · {device_battery_percentage}%",
+        "on-click": "~/.config/riceforge/shell/riceforge-shell bluetooth"
+    },
+
+    "group/senses": {
+        "orientation": "horizontal",
+        "modules": ["pulseaudio", "custom/mic-toggle", "backlight"]
     },
 
     "pulseaudio": {
-        "format": "{icon}  {volume}",
-        "format-bluetooth": "󰂰  {volume}",
-        "format-muted": "󰝟",
-        "format-icons": {
-            "headphone": "󰋋",
-            "hands-free": "󰋋",
-            "headset": "󰋋",
-            "phone": "󰏲",
-            "portable": "󰏲",
-            "car": "󰄋",
-            "default": ["󰕿", "󰖀", "󰕾"]
-        },
+        "format": "{volume}",
+        "format-bluetooth": "{volume}",
+        "format-muted": "muted",
         "tooltip-format": "{desc} · {volume}%",
         "scroll-step": 5,
         "on-click": "pavucontrol",
@@ -179,32 +221,19 @@
     },
 
     "backlight": {
-        "format": "{icon}",
-        "format-icons": ["󰃞", "󰃟", "󰃠"],
+        "format": "{percent}",
         "tooltip-format": "Brightness {percent}%",
         "on-scroll-up": "brightnessctl set 1%+",
         "on-scroll-down": "brightnessctl set 1%-"
     },
 
-    "bluetooth": {
-        "format": "󰂯",
-        "format-off": "󰂲",
-        "format-disabled": "󰂲",
-        "format-connected": "󰂱",
-        "tooltip-format": "{controller_alias} · {status}",
-        "tooltip-format-connected": "{device_alias}",
-        "on-click": "bash ~/.config/waybar/scripts/rofi-bluetooth &",
-        "on-click-right": "blueman-manager"
-    },
-
+    // the vial: liquid level from the state classes below
     "battery": {
         "interval": 30,
-        "states": { "warning": 30, "critical": 15 },
-        "format": "{icon}  {capacity}",
-        "format-charging": "󰂄  {capacity}",
-        "format-plugged": "󰚥  {capacity}",
-        "format-full": "󰁹",
-        "format-icons": ["󰁺", "󰁼", "󰁾", "󰂀", "󰁹"],
+        "states": { "full": 100, "high": 75, "mid": 50, "low": 30, "warning": 20, "critical": 10 },
+        "format": "{capacity}",
+        "format-charging": "{capacity}",
+        "format-plugged": "{capacity}",
         "tooltip-format": "{capacity}% · {timeTo}"
     },
 
@@ -214,7 +243,7 @@
     },
 
     "custom/power-menu": {
-        "format": "󰐥",
+        "format": " ",
         "tooltip": false,
         "menu": "on-click",
         "menu-file": "~/.config/riceforge/current/waybar/power_menu.xml",

@@ -1,0 +1,62 @@
+{
+  "flammarion": {
+    "file": "flammarion.jpg",
+    "title": "Flammarion.jpg",
+    "artist": "AnonymousUnknown author",
+    "date": "1888",
+    "licence": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:Flammarion.jpg",
+    "original_size": [
+      3614,
+      3027
+    ]
+  },
+  "nasmyth-crater": {
+    "file": "nasmyth-crater.jpg",
+    "title": "Normal lunar crater - J. Nasmyth. LCCN2001700463.jpg",
+    "artist": "Nasmyth, James, 1808-1890, photographer",
+    "date": "1874",
+    "licence": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:Normal_lunar_crater_-_J._Nasmyth._LCCN2001700463.jpg",
+    "original_size": [
+      4521,
+      3650
+    ]
+  },
+  "vesalius-musculorum": {
+    "file": "vesalius-musculorum.jpg",
+    "title": "Tertia musculorum tabula (37053621276).jpg",
+    "artist": "National Library of Medicine - History of Medicine",
+    "date": "2010-06-03 17:03:49",
+    "licence": "No restrictions",
+    "page": "https://commons.wikimedia.org/wiki/File:Tertia_musculorum_tabula_(37053621276).jpg",
+    "original_size": [
+      1896,
+      3346
+    ]
+  },
+  "dore-empyrean": {
+    "file": "dore-empyrean.jpg",
+    "title": "Paradiso Canto 31 (no caption).jpg",
+    "artist": "Gustave Doré",
+    "date": "19th centurydate QS:P,+1850-00-00T00:00:00Z/7",
+    "licence": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:Paradiso_Canto_31_(no_caption).jpg",
+    "original_size": [
+      2448,
+      2992
+    ]
+  },
+  "fludd-macrocosm": {
+    "file": "fludd-macrocosm.png",
+    "title": "UtriusqueCosmiMacrocosm.png",
+    "artist": "Robert Fludd",
+    "date": "1621",
+    "licence": "Public domain",
+    "page": "https://commons.wikimedia.org/wiki/File:UtriusqueCosmiMacrocosm.png",
+    "original_size": [
+      2190,
+      1908
+    ]
+  }
+}

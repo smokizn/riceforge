@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# NACRE · Visionary session: riceforge-shell replaces the tray applets
+# (Wi-Fi and Bluetooth panels, the BlueZ pairing agent, desk instruments);
+# the wallpaper runs through awww when installed (crossfades), else swaybg.
+. "$HOME/.config/riceforge/bin/session-lib.sh"
+SHELL_BIN="$HOME/.config/riceforge/shell/riceforge-shell"
+
+wallpaper() {
+    if command -v awww >/dev/null 2>&1 && command -v awww-daemon >/dev/null 2>&1; then
+        stop_all swaybg
+        start_once awww-daemon awww-daemon
+        for _ in $(seq 30); do awww query >/dev/null 2>&1 && break; sleep 0.1; done
+        awww img "$CURRENT/wallpaper.png" --transition-type fade --transition-duration 0.8 >/dev/null 2>&1 \
+            || wallpaper_swaybg
+    else
+        wallpaper_swaybg
+    fi
+}
+
+case "$1" in
+    start)
+        applets_stop
+        wallpaper
+        python3 -I "$HOME/.config/riceforge/shell/lockart.py" moon >/dev/null 2>&1 || true
+        start_once riceforge-shell "$SHELL_BIN"
+        ;;
+    stop)
+        if pgrep -x riceforge-shell >/dev/null; then
+            timeout 3 "$SHELL_BIN" quit >/dev/null 2>&1 || true
+        fi
+        stop_all riceforge-shell awww-daemon
+        ;;
+esac

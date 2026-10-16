@@ -1,23 +1,24 @@
-/* NACRE · glass islands
+/* NACRE · Visionary · Waybar
  *
- * The bar window is fully transparent; Hyprland blurs only behind pixels
- * above alpha 0.28 (layer rule), so every glass body sits above that line
- * and every shadow below it. The "glass" is: real compositor blur, a tint,
- * a sheen that breaks at the midline like a curved surface, a bright top
- * rim (light from above), an inner highlight, and a soft drop shadow.
- * There is no refraction: GTK3 cannot bend what is behind it.
+ * The bar is an astronomer's rule laid over the plate: ink-glass slabs with
+ * an etched border (a silver hairline and, inset, a fainter second rule),
+ * parchment type, engraved icons from the theme's own set. Brass is the sun:
+ * the active star, the clock's today, charging. Crimson only when critical.
+ * Icons are SVG backgrounds swapped by state class (GTK3 cannot recolour them).
  */
 
-@define-color smoke    #18191e;
-@define-color pearl    #d9d9e0;
-@define-color silver   #aeb0bc;
-@define-color mist     #777a88;
-@define-color lavender #a39cc4;
-@define-color ice      #8ea6bf;
-@define-color rose     #c4919d;
+@define-color ink       #0b0a0a;
+@define-color charcoal  #151413;
+@define-color graphite  #2a2826;
+@define-color stone     #6e6a64;
+@define-color silver    #b9bcc2;
+@define-color bone      #e6dfcf;
+@define-color parchment #d6cbb2;
+@define-color brass     #b39a5e;
+@define-color crimson   #a8464f;
 
 * {
-    font-family: "Adwaita Sans", "Inter", "JetBrainsMono Nerd Font Propo", sans-serif;
+    font-family: "Adwaita Sans", "Inter", sans-serif;
     font-size: 13px;
     font-weight: 500;
     border: none;
@@ -27,218 +28,244 @@
     text-shadow: none;
 }
 
-window#waybar {
-    background: transparent;
-    color: @pearl;
-}
+window#waybar { background: transparent; color: @parchment; }
 
 /* ── materials ─────────────────────────────────────────────────── */
 
-/* slab: the main frosted panes */
-#nav, #controls {
-    background-color: alpha(#25262d, 0.42);
-    background-image: linear-gradient(to bottom,
-        alpha(white, 0.16), alpha(white, 0.04) 48%,
-        alpha(white, 0.00) 52%, alpha(white, 0.035));
-    border: 1px solid alpha(white, 0.09);
-    border-top-color: alpha(white, 0.24);
-    border-bottom-color: alpha(white, 0.05);
-    box-shadow: inset 0 1px alpha(white, 0.08), 0 5px 14px alpha(#05050c, 0.24);
-    border-radius: 20px;
-    margin: 5px 4px;
-    transition: background-color 260ms ease, border-color 260ms ease;
+/* the slab: ink glass with an etched double edge */
+#nav, #connections, #tray {
+    background-color: alpha(@charcoal, 0.66);
+    background-image: linear-gradient(to bottom, alpha(@bone, 0.07), alpha(@bone, 0.0) 55%);
+    border: 1px solid alpha(@silver, 0.22);
+    box-shadow: inset 0 0 0 3px alpha(@ink, 0.0), inset 0 0 0 4px alpha(@silver, 0.07),
+                0 4px 12px alpha(black, 0.25);
+    border-radius: 14px;
+    margin: 6px 4px;
+    transition: border-color 220ms ease, background-color 220ms ease;
 }
-#nav:hover, #controls:hover {
-    background-color: alpha(#2c2d35, 0.50);
-    border-top-color: alpha(white, 0.34);
+#nav:hover, #connections:hover, #tray:hover {
+    border-color: alpha(@silver, 0.38);
+    background-color: alpha(@charcoal, 0.76);
 }
 
-/* droplet: the clock, denser and brighter, the one thing you look at */
-#clock {
-    font-family: "Mona Sans", "Adwaita Sans", sans-serif;
-    font-feature-settings: "tnum";
-    font-size: 15px;
-    font-weight: 600;
-    color: @pearl;
-    padding: 0 22px;
+/* the plaque: the clock, framed like an instrument's dial plate */
+#plaque {
+    background-color: alpha(@ink, 0.70);
+    background-image: linear-gradient(to bottom, alpha(@bone, 0.09), alpha(@bone, 0.0) 50%, alpha(@brass, 0.04));
+    border: 1px solid alpha(@silver, 0.42);
+    box-shadow: inset 0 0 0 3px alpha(@ink, 0.0), inset 0 0 0 4px alpha(@silver, 0.16),
+                0 5px 14px alpha(black, 0.27);
+    border-radius: 10px;
     margin: 4px 4px;
-    border-radius: 22px;
-    background-color: alpha(#2a2b33, 0.48);
-    background-image: linear-gradient(to bottom,
-        alpha(white, 0.20), alpha(white, 0.06) 46%,
-        alpha(white, 0.00) 54%, alpha(@lavender, 0.06));
-    border: 1px solid alpha(white, 0.10);
-    border-top-color: alpha(white, 0.36);
-    box-shadow: inset 0 1px alpha(white, 0.14), 0 6px 16px alpha(#05050c, 0.26);
-    transition: background-color 260ms ease, border-color 260ms ease;
-}
-#clock:hover {
-    background-color: alpha(#31323b, 0.56);
-    border-top-color: alpha(white, 0.46);
+    padding: 0 8px 0 4px;
 }
 
-/* satellite: clearer, thinner glass for secondary things */
-#taskbar, #system, #tray, #custom-spotify, #custom-hb {
-    background-color: alpha(#2b2c34, 0.33);
-    background-image: linear-gradient(to bottom, alpha(white, 0.09), alpha(white, 0.0) 55%);
-    border: 1px solid alpha(white, 0.07);
-    border-top-color: alpha(white, 0.18);
-    box-shadow: 0 4px 12px alpha(#05050c, 0.2);
-    border-radius: 16px;
-    margin: 8px 4px;
-    padding: 0 10px;
-    transition: background-color 240ms ease, border-color 240ms ease;
+/* senses: no slab, an engraved underline */
+#senses {
+    margin: 11px 8px;
+    padding: 0 2px;
+    border-bottom: 1px solid alpha(@silver, 0.28);
 }
-#taskbar:hover, #system:hover, #tray:hover, #custom-spotify:hover, #custom-hb:hover {
-    background-color: alpha(#33343d, 0.44);
-    border-top-color: alpha(white, 0.30);
-}
-#taskbar.empty { background: transparent; border-color: transparent; box-shadow: none; padding: 0; margin: 0; }
 
-/* orbs: perfect circles, the two ends of the bar */
-#custom-orb, #custom-power-menu {
-    min-width: 34px;
-    min-height: 34px;
-    padding: 0;
-    border-radius: 999px;
-    font-size: 15px;
-    color: @pearl;
-}
-#custom-orb {
-    margin: 1px 2px 1px 1px;
-    background-image: radial-gradient(circle at 35% 25%, alpha(white, 0.30), alpha(@lavender, 0.18) 55%, alpha(@ice, 0.10));
-    box-shadow: inset 0 1px alpha(white, 0.35), inset 0 -2px 4px alpha(#05050c, 0.25);
-    transition: background-color 220ms ease, color 220ms ease;
-}
-#custom-orb:hover { background-color: alpha(@lavender, 0.25); color: white; }
+/* instruments: plain small type */
+#system { margin: 0 4px; }
 
-#custom-power-menu {
-    margin: 6px 0 6px 4px;
+/* ── the sigil and the power orb ───────────────────────────────── */
+#custom-sigil, #custom-power-menu {
     min-width: 32px;
     min-height: 32px;
-    background-color: alpha(#25262d, 0.42);
-    background-image: radial-gradient(circle at 35% 25%, alpha(white, 0.18), alpha(white, 0.0) 60%);
-    border: 1px solid alpha(white, 0.09);
-    border-top-color: alpha(white, 0.24);
-    box-shadow: 0 5px 14px alpha(#05050c, 0.24);
-    color: @silver;
-    transition: background-color 220ms ease, color 220ms ease;
-}
-#custom-power-menu:hover { background-color: alpha(@rose, 0.32); color: white; }
-
-/* ── the liquid workspace track ───────────────────────────────── */
-/* dots that stretch: the active one flows into a lozenge with an
-   overshooting curve, so it lands with a tiny elastic snap */
-#workspaces { padding: 0 10px 0 6px; }
-#workspaces button {
-    min-width: 8px;
-    min-height: 8px;
-    margin: 13px 4px;
     padding: 0;
     border-radius: 999px;
-    background-color: alpha(@pearl, 0.34);
-    background-image: none;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20px 20px;
+    transition: background-color 200ms ease, border-color 200ms ease;
+}
+#custom-sigil {
+    margin: 1px 2px 1px 1px;
+    background-image: url("file:///home/smoke/.config/riceforge/current/icons/brass/sigil.svg");
+    background-color: alpha(@ink, 0.55);
+    border: 1px solid alpha(@brass, 0.45);
+}
+#custom-sigil:hover { background-color: alpha(@brass, 0.16); border-color: alpha(@brass, 0.8); }
+#custom-power-menu {
+    margin: 7px 0 7px 4px;
+    min-width: 30px; min-height: 30px;
+    background-size: 16px 16px;
+    background-image: url("file:///home/smoke/.config/riceforge/current/icons/silver/power.svg");
+    background-color: alpha(@charcoal, 0.66);
+    border: 1px solid alpha(@silver, 0.22);
+}
+#custom-power-menu:hover {
+    background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/power.svg");
+    background-color: alpha(@crimson, 0.28);
+    border-color: alpha(@crimson, 0.7);
+}
+
+/* ── the constellation: workspaces as stars on a hairline ──────── */
+#workspaces {
+    padding: 0 8px 0 4px;
+    background-image: linear-gradient(to right, alpha(@silver, 0.0), alpha(@silver, 0.28) 15%,
+                                                alpha(@silver, 0.28) 85%, alpha(@silver, 0.0));
+    background-size: 100% 1px;
+    background-position: 0 50%;
+    background-repeat: no-repeat;
+}
+#workspaces button {
+    min-width: 24px;
+    padding: 0;
+    margin: 0;
     color: transparent;
-    transition: min-width 460ms cubic-bezier(0.34, 1.56, 0.64, 1),
-                background-color 260ms ease, box-shadow 260ms ease;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 13px 13px;
+    background-image: url("file:///home/smoke/.config/riceforge/current/icons/silver/star.svg");
+    transition: background-size 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 #workspaces button label { font-size: 1px; color: transparent; }
 #workspaces button.empty {
-    background-color: transparent;
-    box-shadow: inset 0 0 0 1.5px alpha(@pearl, 0.26);
+    background-size: 9px 9px;
+    background-image: url("file:///home/smoke/.config/riceforge/current/icons/stone/star.svg");
 }
 #workspaces button:hover {
-    min-width: 14px;
-    background-color: alpha(@pearl, 0.62);
-    box-shadow: none;
+    background-size: 15px 15px;
+    background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/star.svg");
 }
 #workspaces button.active {
-    min-width: 30px;
-    background-color: @lavender;
-    background-image: linear-gradient(to right, #c2bdd8, @lavender 50%, @ice);
-    box-shadow: inset 0 1px alpha(white, 0.40), 0 1px 4px alpha(@lavender, 0.14);
+    background-size: 18px 18px;
+    background-image: url("file:///home/smoke/.config/riceforge/current/icons/brass/star-filled.svg");
 }
-#workspaces button.urgent { background-color: @rose; box-shadow: none; }
+#workspaces button.urgent {
+    background-image: url("file:///home/smoke/.config/riceforge/current/icons/crimson/star-filled.svg");
+}
 
-/* ── contents ─────────────────────────────────────────────────── */
-
+/* ── the taskbar: quiet unless focused ─────────────────────────── */
+#taskbar { padding: 0 4px; }
 #taskbar button {
-    padding: 0 5px;
-    margin: 3px 1px;
-    border-radius: 11px;
+    padding: 0 5px; margin: 6px 1px;
+    border-radius: 9px;
     background: transparent;
-    transition: background-color 200ms ease, box-shadow 200ms ease;
+    transition: background-color 180ms ease;
 }
-#taskbar button:hover { background-color: alpha(white, 0.10); }
-#taskbar button.active {
-    background-color: alpha(@lavender, 0.20);
-    box-shadow: inset 0 1px alpha(white, 0.22);
+#taskbar button:hover  { background-color: alpha(@bone, 0.07); }
+#taskbar button.active { background-color: alpha(@brass, 0.16); box-shadow: inset 0 -1px alpha(@brass, 0.7); }
+
+/* ── the plaque's contents ─────────────────────────────────────── */
+#custom-moon {
+    min-width: 22px;
+    margin: 0 4px 0 6px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 18px 18px;
+}
+#custom-moon.moon-0 { background-image: url("file:///home/smoke/.config/riceforge/current/icons/silver/moon-0.svg"); }
+#custom-moon.moon-1 { background-image: url("file:///home/smoke/.config/riceforge/current/icons/silver/moon-1.svg"); }
+#custom-moon.moon-2 { background-image: url("file:///home/smoke/.config/riceforge/current/icons/silver/moon-2.svg"); }
+#custom-moon.moon-3 { background-image: url("file:///home/smoke/.config/riceforge/current/icons/silver/moon-3.svg"); }
+#custom-moon.moon-4 { background-image: url("file:///home/smoke/.config/riceforge/current/icons/silver/moon-4.svg"); }
+#custom-moon.moon-5 { background-image: url("file:///home/smoke/.config/riceforge/current/icons/silver/moon-5.svg"); }
+#custom-moon.moon-6 { background-image: url("file:///home/smoke/.config/riceforge/current/icons/silver/moon-6.svg"); }
+#custom-moon.moon-7 { background-image: url("file:///home/smoke/.config/riceforge/current/icons/silver/moon-7.svg"); }
+
+#clock {
+    font-family: "Cormorant", "Noto Serif", serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: @bone;
+    padding: 0 10px 0 4px;
 }
 
-#custom-spotify { color: @silver; font-size: 12px; padding: 0 14px; }
-#custom-spotify:hover { color: @pearl; }
-
-#system { padding: 0 6px; }
-#cpu, #memory, #custom-fan_monitor, #custom-fan { color: @silver; padding: 0 6px; font-size: 12px; }
-#cpu:hover, #memory:hover, #custom-fan:hover { color: @pearl; }
-#custom-fan_monitor.low    { color: @ice; }
-#custom-fan_monitor.medium { color: @lavender; }
-#custom-fan_monitor.high   { color: @rose; }
-
-#controls { padding: 0 6px; }
-#pulseaudio, #custom-mic-toggle, #backlight, #bluetooth, #battery {
-    color: @pearl;
-    padding: 0 9px;
-    margin: 6px 0;
-    border-radius: 14px;
-    transition: background-color 200ms ease, color 200ms ease;
+#custom-spotify {
+    margin: 9px 4px;
+    padding: 0 12px 0 28px;
+    font-size: 12px;
+    color: @parchment;
+    border-radius: 999px;
+    background-color: alpha(@charcoal, 0.6);
+    border: 1px solid alpha(@silver, 0.16);
+    background-image: url("file:///home/smoke/.config/riceforge/current/icons/stone/music.svg");
+    background-repeat: no-repeat;
+    background-position: 9px 50%;
+    background-size: 13px 13px;
 }
-#pulseaudio:hover, #custom-mic-toggle:hover, #backlight:hover, #bluetooth:hover, #battery:hover {
-    background-color: alpha(white, 0.09);
-}
-#pulseaudio.muted, #custom-mic-toggle { color: @mist; }
-#bluetooth.off, #bluetooth.disabled { color: alpha(@mist, 0.6); }
-#bluetooth.connected { color: @ice; }
-#battery.charging, #battery.plugged { color: @ice; }
-#battery.warning:not(.charging) { color: @lavender; }
-#battery.critical:not(.charging) {
-    color: #17131a;
-    background-color: @rose;
-}
+#custom-spotify:hover { color: @bone; border-color: alpha(@brass, 0.5); }
 
-#tray { padding: 0 12px; }
+/* ── icon + text modules ───────────────────────────────────────── */
+#network, #bluetooth, #pulseaudio, #backlight, #battery, #cpu, #memory {
+    background-repeat: no-repeat;
+    background-position: 8px 50%;
+    background-size: 15px 15px;
+    padding: 0 10px 0 29px;
+    color: @parchment;
+    transition: color 160ms ease;
+}
+#network:hover, #bluetooth:hover, #pulseaudio:hover, #backlight:hover { color: @bone; }
+
+#network                { background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/wifi-3.svg"); }
+#network.linked         { background-image: url("file:///home/smoke/.config/riceforge/current/icons/stone/wifi-0.svg"); }
+#network.ethernet       { background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/ethernet.svg"); }
+#network.disconnected,
+#network.disabled       { background-image: url("file:///home/smoke/.config/riceforge/current/icons/stone/wifi-off.svg"); color: @stone; }
+
+#bluetooth              { background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/bluetooth.svg"); }
+#bluetooth.connected    { background-image: url("file:///home/smoke/.config/riceforge/current/icons/brass/bluetooth-connected.svg"); color: @bone; }
+#bluetooth.off,
+#bluetooth.disabled     { background-image: url("file:///home/smoke/.config/riceforge/current/icons/stone/bluetooth-off.svg"); color: @stone; }
+
+#pulseaudio             { background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/volume-2.svg"); }
+#pulseaudio.muted       { background-image: url("file:///home/smoke/.config/riceforge/current/icons/stone/volume-muted.svg"); color: @stone; }
+#backlight              { background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/brightness.svg"); }
+#custom-mic-toggle      { color: @stone; padding: 0 8px; }
+#custom-mic-toggle:hover { color: @bone; }
+
+#cpu    { background-image: url("file:///home/smoke/.config/riceforge/current/icons/stone/cpu.svg"); color: @stone; font-size: 12px; }
+#memory { background-image: url("file:///home/smoke/.config/riceforge/current/icons/stone/memory.svg"); color: @stone; font-size: 12px; }
+#cpu:hover, #memory:hover { color: @bone; }
+#custom-fan {
+    min-width: 26px;
+    background-image: url("file:///home/smoke/.config/riceforge/current/icons/stone/fan.svg");
+    background-repeat: no-repeat; background-position: center; background-size: 15px 15px;
+}
+#custom-fan:hover { background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/fan.svg"); }
+#custom-fan_monitor { padding: 0 6px; font-size: 12px; color: @stone; }
+#custom-fan_monitor.low    { color: @stone; }
+#custom-fan_monitor.medium { color: @parchment; }
+#custom-fan_monitor.high   { color: @crimson; }
+
+/* the vial */
+#battery          { margin: 0 2px; background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/battery-4.svg"); }
+#battery.high     { background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/battery-3.svg"); }
+#battery.mid      { background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/battery-2.svg"); }
+#battery.low      { background-image: url("file:///home/smoke/.config/riceforge/current/icons/bone/battery-1.svg"); }
+#battery.warning  { background-image: url("file:///home/smoke/.config/riceforge/current/icons/brass/battery-1.svg"); color: @brass; }
+#battery.critical { background-image: url("file:///home/smoke/.config/riceforge/current/icons/crimson/battery-0.svg"); color: @crimson; }
+#battery.charging,
+#battery.plugged  { background-image: url("file:///home/smoke/.config/riceforge/current/icons/brass/battery-charging.svg"); color: @bone; }
+
+#tray { padding: 0 10px; }
 #tray > .passive { -gtk-icon-effect: dim; }
-#tray > .needs-attention { background-color: alpha(@rose, 0.3); border-radius: 10px; }
+#tray > .needs-attention { background-color: alpha(@crimson, 0.3); border-radius: 8px; }
 
-#custom-hb { padding: 0 8px; }
-#custom-hb.shooting { background-color: alpha(@rose, 0.35); }
+#custom-hb { margin: 9px 4px; padding: 0 8px; border-radius: 999px; background-color: alpha(@charcoal, 0.5); }
+#custom-hb.shooting { background-color: alpha(@crimson, 0.35); }
 #custom-bullet.bullet { font-size: 16px; }
 #custom-bullet.impact { font-size: 19px; }
 
-/* ── popups: tooltips and the power menu ─────────────────────── */
+/* ── popups ────────────────────────────────────────────────────── */
 tooltip {
-    background-color: alpha(#18191e, 0.92);
-    background-image: linear-gradient(to bottom, alpha(white, 0.08), alpha(white, 0.0) 50%);
-    border: 1px solid alpha(white, 0.10);
-    border-top-color: alpha(white, 0.24);
-    border-radius: 14px;
-}
-tooltip label { color: @pearl; padding: 4px 6px; }
-
-menu {
-    background-color: alpha(#18191e, 0.94);
-    border: 1px solid alpha(white, 0.10);
-    border-top-color: alpha(white, 0.24);
-    border-radius: 16px;
-    padding: 6px;
-}
-menuitem {
-    color: @pearl;
-    padding: 8px 16px;
+    background-color: alpha(@charcoal, 0.96);
+    border: 1px solid alpha(@silver, 0.28);
     border-radius: 10px;
 }
-menuitem:hover {
-    background-color: alpha(@lavender, 0.22);
-    background-image: linear-gradient(to bottom, alpha(white, 0.10), alpha(white, 0.0));
+tooltip label { color: @parchment; padding: 4px 6px; }
+
+menu {
+    background-color: alpha(@charcoal, 0.97);
+    border: 1px solid alpha(@silver, 0.28);
+    border-radius: 12px;
+    padding: 6px;
 }
-menu separator { background-color: alpha(white, 0.08); min-height: 1px; margin: 4px 8px; }
+menuitem { color: @parchment; padding: 7px 16px; border-radius: 8px; }
+menuitem:hover { background-color: alpha(@brass, 0.18); color: @bone; }
+menu separator { background-color: alpha(@silver, 0.12); min-height: 1px; margin: 4px 8px; }

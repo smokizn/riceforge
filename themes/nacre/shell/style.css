@@ -1,0 +1,240 @@
+/* NACRE · Visionary · riceforge-shell
+ * Plates of ink glass with an etched border: a silver hairline and, inset,
+ * a second fainter rule (the plate mark). Parchment type, Cormorant small
+ * caps for eyebrows and titles, brass reserved for the sun: primary actions,
+ * active things. Crimson only for danger and critical states.
+ */
+
+@define-color ink       #0b0a0a;
+@define-color charcoal  #151413;
+@define-color graphite  #2a2826;
+@define-color stone     #6e6a64;
+@define-color silver    #b9bcc2;
+@define-color bone      #e6dfcf;
+@define-color parchment #d6cbb2;
+@define-color brass     #b39a5e;
+@define-color crimson   #a8464f;
+
+window.rf-window { background: transparent; }
+
+* {
+  font-family: "Adwaita Sans", "Inter", sans-serif;
+  color: @parchment;
+}
+
+/* ── the plate ─────────────────────────────────────────────────── */
+.rf-plate {
+  margin: 14px;
+  padding: 18px 18px 12px 18px;
+  border-radius: 18px;
+  background-color: alpha(@charcoal, 0.84);
+  background-image: linear-gradient(176deg, alpha(@bone, 0.07), alpha(@bone, 0.0) 34%,
+                                             alpha(@bone, 0.0) 80%, alpha(@brass, 0.035));
+  border: 1px solid alpha(@silver, 0.30);
+  box-shadow: inset 0 0 0 5px alpha(@ink, 0.0),
+              inset 0 0 0 6px alpha(@silver, 0.10),        /* the plate mark */
+              inset 0 1px alpha(@bone, 0.10),
+              0 18px 44px alpha(black, 0.55);
+}
+
+.rf-head { margin-bottom: 10px; }
+.rf-head-icon { -gtk-icon-size: 22px; margin-top: 4px; }
+.rf-eyebrow {
+  font-family: "Cormorant SC", "Cormorant", "Noto Serif", serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: @brass;
+}
+.rf-title {
+  font-family: "Cormorant", "Noto Serif", serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: @bone;
+}
+.rf-subtitle { font-size: 12px; color: @stone; }
+
+/* engraved double rule under the header */
+.rf-double-rule {
+  min-height: 4px;
+  margin: 0 0 12px 0;
+  border-top: 1px solid alpha(@silver, 0.35);
+  border-bottom: 1px solid alpha(@silver, 0.14);
+}
+.rf-hairline { min-height: 1px; background-color: alpha(@silver, 0.16); }
+
+.rf-section {
+  font-family: "Cormorant SC", "Cormorant", "Noto Serif", serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: @silver;
+}
+.rf-section-head { margin: 2px 2px 4px 2px; }
+
+/* ── lists and rows ────────────────────────────────────────────── */
+list.rf-list, .rf-list { background: transparent; }
+.rf-row {
+  padding: 9px 10px;
+  margin: 1px 0;
+  border-radius: 12px;
+  background: transparent;
+  transition: background-color 160ms ease;
+}
+.rf-row:hover { background-color: alpha(@bone, 0.045); }
+.rf-row-title { font-size: 14px; font-weight: 500; color: @bone; }
+.rf-row-sub   { font-size: 11.5px; color: @stone; }
+.rf-empty { font-size: 13px; color: @stone; font-style: italic; margin: 6px 4px; }
+.rf-warn  { font-size: 12px; color: #d5a0a6; }
+.rf-attrib { font-size: 11px; color: @stone; font-style: italic; }
+.rf-hint { font-size: 11px; color: @stone; letter-spacing: 1px; margin-top: 2px; }
+
+.rf-card {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background-color: alpha(@ink, 0.45);
+  border: 1px solid alpha(@silver, 0.14);
+}
+.rf-card-active {
+  border-color: alpha(@brass, 0.45);
+  box-shadow: inset 0 0 0 3px alpha(@ink, 0.0), inset 0 0 0 4px alpha(@brass, 0.10);
+}
+
+.rf-form { padding: 10px 2px 4px 34px; }
+
+/* ── controls ─────────────────────────────────────────────────── */
+button {
+  border-radius: 10px;
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+button.rf-ghost { padding: 5px 7px; }
+button.rf-ghost:hover { background-color: alpha(@bone, 0.07); }
+button.rf-quiet {
+  border-color: alpha(@silver, 0.28);
+  color: @bone;
+}
+button.rf-quiet:hover { border-color: alpha(@brass, 0.6); background-color: alpha(@brass, 0.08); }
+button.rf-primary {
+  background-color: alpha(@brass, 0.22);
+  border-color: alpha(@brass, 0.65);
+  color: @bone;
+}
+button.rf-primary:hover { background-color: alpha(@brass, 0.32); }
+button.rf-danger { background-color: alpha(@crimson, 0.30); border-color: alpha(@crimson, 0.7); }
+button.rf-active { background-color: alpha(@brass, 0.18); border-color: alpha(@brass, 0.5); }
+button:disabled { opacity: 0.4; }
+
+switch {
+  background-color: alpha(@graphite, 0.9);
+  border: 1px solid alpha(@silver, 0.25);
+  border-radius: 999px;
+}
+switch:checked { background-color: alpha(@brass, 0.55); border-color: alpha(@brass, 0.8); }
+switch slider { background-color: @bone; border-radius: 999px; }
+
+entry.rf-entry, .rf-entry {
+  padding: 7px 10px;
+  border-radius: 10px;
+  background-color: alpha(@ink, 0.6);
+  border: 1px solid alpha(@silver, 0.22);
+  color: @bone;
+  caret-color: @brass;
+}
+.rf-entry:focus-within { border-color: alpha(@brass, 0.7); }
+
+checkbutton { color: @parchment; }
+checkbutton check { border-radius: 4px; border: 1px solid alpha(@silver, 0.4); background-color: alpha(@ink, 0.6); }
+checkbutton check:checked { background-color: alpha(@brass, 0.6); }
+
+expander-widget > box > title, .rf-expander title { color: @silver; font-size: 13px; }
+expander-widget arrow { color: @stone; }
+
+spinner { color: @brass; }
+
+/* ── footer status ────────────────────────────────────────────── */
+.rf-foot { margin-top: 10px; padding-top: 8px; border-top: 1px solid alpha(@silver, 0.10); }
+.rf-status { font-size: 12px; color: @stone; }
+.rf-status-ok    { color: @silver; }
+.rf-status-busy  { color: @parchment; }
+.rf-status-error { color: #d5a0a6; }
+
+/* ── pairing prompt ───────────────────────────────────────────── */
+.rf-prompt { padding: 20px; }
+.rf-prompt-text { font-size: 14px; color: @bone; }
+.rf-passkey {
+  font-family: "Iosevka Nerd Font Mono", monospace;
+  font-size: 34px;
+  letter-spacing: 8px;
+  color: @brass;
+  margin: 6px 0;
+}
+
+/* ── the plate archive ────────────────────────────────────────── */
+.rf-gallery .rf-plate { padding: 22px 24px 14px 24px; }
+flowbox.rf-flow { background: transparent; }
+flowboxchild.rf-tile {
+  padding: 8px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+flowboxchild.rf-tile:hover { background-color: alpha(@bone, 0.04); }
+flowboxchild.rf-tile:selected {
+  background-color: alpha(@brass, 0.10);
+  border-color: alpha(@brass, 0.55);
+}
+flowboxchild.rf-tile:focus-visible { outline: 1px solid alpha(@brass, 0.8); outline-offset: 2px; }
+.rf-thumb { border-radius: 8px; border: 1px solid alpha(@silver, 0.22); }
+.rf-tile-title { font-family: "Cormorant", "Noto Serif", serif; font-size: 16px; font-weight: 600; color: @bone; }
+.rf-tile-sub   { font-size: 11px; color: @stone; }
+.rf-tile-active .rf-thumb { border-color: alpha(@brass, 0.8); }
+.rf-badge {
+  margin: 8px; padding: 2px 8px;
+  border-radius: 999px;
+  background-color: alpha(@ink, 0.8);
+  border: 1px solid alpha(@brass, 0.6);
+}
+.rf-badge-text { font-size: 10px; letter-spacing: 1px; color: @brass; }
+.rf-missing {
+  font-size: 12px; color: #d5a0a6;
+  background-color: alpha(@ink, 0.75);
+  padding: 4px 8px; border-radius: 6px;
+}
+
+/* ── desk instruments ─────────────────────────────────────────── */
+.rf-desk { padding: 4px; }
+.rf-astrolabe { padding: 0 4px; }
+.rf-desk-time {
+  font-family: "Cormorant", "Noto Serif", serif;
+  font-size: 34px; font-weight: 600;
+  color: @bone;
+  margin-top: 4px;
+}
+.rf-desk-date { font-family: "Cormorant SC", "Cormorant", "Noto Serif", serif; font-size: 14px; letter-spacing: 2px; color: @silver; }
+.rf-desk-sky  { font-size: 11px; color: @stone; margin-top: 2px; }
+
+.rf-strip { margin-top: 6px; }
+button.rf-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: alpha(@charcoal, 0.72);
+  border: 1px solid alpha(@silver, 0.20);
+  box-shadow: inset 0 1px alpha(@bone, 0.06);
+}
+button.rf-chip:hover { border-color: alpha(@brass, 0.55); background-color: alpha(@charcoal, 0.86); }
+.rf-chip-text { font-size: 11.5px; color: @parchment; }
+button.rf-chip-critical { border-color: alpha(@crimson, 0.8); background-color: alpha(@crimson, 0.25); }
+
+.rf-ephemeris { margin: 6px 4px; }
+
+tooltip {
+  background-color: alpha(@charcoal, 0.95);
+  border: 1px solid alpha(@silver, 0.25);
+  border-radius: 8px;
+}
+tooltip label { color: @parchment; font-size: 12px; }
+
+/* the archive is a reading surface: denser glass */
+.rf-gallery .rf-plate { background-color: alpha(@charcoal, 0.94); }

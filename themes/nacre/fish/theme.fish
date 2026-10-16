@@ -1,4 +1,4 @@
-# NACRE · fish layer
+# NACRE · Visionary · fish layer
 # Sourced by ~/.config/fish/conf.d/riceforge.fish only while nacre is the
 # active riceforge theme. Everything here is session-scoped (set -g,
 # function definitions): nothing is written to universal variables, so
@@ -13,24 +13,24 @@
 # so scrollback stays quiet. One `git status` per prompt, nothing else forks.
 
 # ── palette ─────────────────────────────────────────────────────────
-set -g __nacre_text     d4d4dc
-set -g __nacre_bright   e2e2e8
-set -g __nacre_silver   aeb0bc
-set -g __nacre_mist     777a88
-set -g __nacre_dim      4d505c
-set -g __nacre_lavender a39cc4
-set -g __nacre_lavlight b0a9cc
-set -g __nacre_steel    8ea6bf
-set -g __nacre_celadon  8db5a2
-set -g __nacre_wheat    cdbf98
-set -g __nacre_rose     c4919d
-set -g __nacre_roselight d4a5af
+set -g __nacre_text     d6cbb2
+set -g __nacre_bright   e6dfcf
+set -g __nacre_silver   b9bcc2
+set -g __nacre_mist     6e6a64
+set -g __nacre_dim      4a4641
+set -g __nacre_lavender b39a5e
+set -g __nacre_lavlight d4bf8a
+set -g __nacre_steel    a0adc0
+set -g __nacre_celadon  a8b89c
+set -g __nacre_wheat    d8c38e
+set -g __nacre_rose     c98580
+set -g __nacre_roselight d9a19c
 # chip surfaces: opaque, a shade above the glass so they read as inlaid tiles
-set -g __nacre_chip_dir  24252c
-set -g __nacre_chip_git  2a2837
-set -g __nacre_chip_env  222a33
-set -g __nacre_chip_err  36262c
-set -g __nacre_chip_ssh  2b2a27
+set -g __nacre_chip_dir  1c1a17
+set -g __nacre_chip_git  26211a
+set -g __nacre_chip_env  1a1e22
+set -g __nacre_chip_err  2c1a1b
+set -g __nacre_chip_ssh  22201b
 
 # glyphs (Nerd Font private-use codepoints)
 set -g __nacre_cap_l   
@@ -55,19 +55,19 @@ set -g fish_color_redirection     $__nacre_steel
 set -g fish_color_end             $__nacre_mist
 set -g fish_color_operator        $__nacre_steel
 set -g fish_color_escape          $__nacre_wheat
-set -g fish_color_comment         5f6270 --italics
+set -g fish_color_comment         57534d --italics
 set -g fish_color_error           $__nacre_rose
 set -g fish_color_autosuggestion  $__nacre_dim
 set -g fish_color_valid_path      --underline
 set -g fish_color_cancel          $__nacre_rose
-set -g fish_color_search_match    --background=2f2c3d
-set -g fish_color_selection       $__nacre_bright --background=3b3850
+set -g fish_color_search_match    --background=2e2819
+set -g fish_color_selection       $__nacre_bright --background=3a3226
 set -g fish_color_history_current --bold
 set -g fish_pager_color_prefix              $__nacre_lavender --bold
 set -g fish_pager_color_completion          $__nacre_silver
 set -g fish_pager_color_description         $__nacre_mist --italics
 set -g fish_pager_color_progress            $__nacre_mist
-set -g fish_pager_color_selected_background --background=2a2b33
+set -g fish_pager_color_selected_background --background=26211a
 set -g fish_pager_color_selected_prefix     $__nacre_bright --bold
 set -g fish_pager_color_selected_completion $__nacre_bright
 
@@ -147,7 +147,7 @@ function __nacre_git
 
     set_color $__nacre_chip_git
     printf '%s' $__nacre_cap_l
-    set_color -b $__nacre_chip_git $__nacre_lavlight
+    set_color -b $__nacre_chip_git $__nacre_lavender
     printf ' %s %s' $__nacre_i_git $branch
     test $conflict -gt 0;  and set_color -b $__nacre_chip_git $__nacre_rose;    and printf ' !%s' $conflict
     test $staged -gt 0;    and set_color -b $__nacre_chip_git $__nacre_celadon; and printf ' +%s' $staged
@@ -249,16 +249,26 @@ end
 function fish_mode_prompt
 end
 
-# a single quiet line instead of a banner
+# a single quiet line instead of a banner: the moon, the day, the uptime.
+# the phase uses the mean synodic month (±half a day): fine for a greeting.
 function fish_greeting
+    set -l now (date +%s)
+    set -l age (math "(($now / 86400 + 2440587.5) - 2451550.1) % 29.530588853")
+    set -l names "new moon" "waxing crescent" "first quarter" "waxing gibbous" \
+        "full moon" "waning gibbous" "last quarter" "waning crescent"
+    set -l idx (math "(round($age / 29.530588853 * 8) % 8) + 1")
     set -l up (string split . < /proc/uptime)[1]
     set -l h (math --scale=0 "floor($up / 3600)")
     set -l m (math --scale=0 "floor($up % 3600 / 60)")
-    set_color $__nacre_lavender
-    printf '  ◦ '
     set_color $__nacre_silver
+    printf '  ☾ '
+    set_color $__nacre_text
+    printf '%s' $names[$idx]
+    set_color $__nacre_mist
+    printf '  ·  '
+    set_color $__nacre_text
     printf '%s' (date '+%A %-d %B')
     set_color $__nacre_mist
-    printf '  ·  up %sh %sm  ·  fish %s\n' $h $m $version
+    printf '  ·  up %sh %sm\n' $h $m
     set_color normal
 end

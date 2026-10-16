@@ -1,2 +1,5 @@
 current
 backups/*.tar.gz
+shell/__pycache__/
+shell/tests/__pycache__/
+themes/nacre/tools/plates/__pycache__/

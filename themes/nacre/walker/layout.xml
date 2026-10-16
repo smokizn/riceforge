@@ -28,6 +28,52 @@
             <property name="hexpand">true</property>
             <property name="spacing">10</property>
             <child>
+              <object class="GtkBox" id="VisionaryHeader">
+                <style>
+                  <class name="v-header"></class>
+                </style>
+                <property name="orientation">horizontal</property>
+                <property name="spacing">10</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="file">/home/smoke/.config/riceforge/current/icons/brass/sun.svg</property>
+                    <property name="pixel-size">18</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <style>
+                      <class name="v-title"></class>
+                    </style>
+                    <property name="label">INVOCATIO</property>
+                    <property name="xalign">0</property>
+                    <property name="hexpand">true</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <style>
+                      <class name="v-hint"></class>
+                    </style>
+                    <property name="label">;  providers   /  files   =  calc   :  clipboard</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkImage">
+                    <property name="file">/home/smoke/.config/riceforge/current/icons/silver/moon-2.svg</property>
+                    <property name="pixel-size">16</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <style>
+                  <class name="v-rule"></class>
+                </style>
+              </object>
+            </child>
+            <child>
               <object class="GtkBox" id="SearchContainer">
                 <style>
                   <class name="search-container"></class>

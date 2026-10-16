@@ -47,6 +47,15 @@
       </object>
     </child>
     <child>
+      <object class="GtkLabel">
+        <style>
+          <class name="item-tag"></class>
+        </style>
+        <property name="label">clip</property>
+        <property name="valign">center</property>
+      </object>
+    </child>
+    <child>
       <object class="GtkLabel" id="QuickActivation">
         <style>
           <class name="item-quick-activation"></class>

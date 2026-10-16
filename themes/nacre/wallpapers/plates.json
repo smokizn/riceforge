@@ -1,0 +1,197 @@
+[
+  {
+    "id": "machina-mundi",
+    "title": "Machina Mundi",
+    "file": "machina-mundi.png",
+    "palette": "ink · bone · brass",
+    "category": "cosmology",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "origin": "public-domain composite",
+    "attribution": {
+      "title": "Flammarion.jpg",
+      "artist": "AnonymousUnknown author",
+      "date": "1888",
+      "licence": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Flammarion.jpg"
+    },
+    "order": 1
+  },
+  {
+    "id": "anatomia-montium",
+    "title": "Anatomia Montium",
+    "file": "anatomia-montium.png",
+    "palette": "ink · bone · brass",
+    "category": "anatomy & landscape",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "origin": "public-domain composite",
+    "attribution": {
+      "title": "Tertia musculorum tabula (37053621276).jpg",
+      "artist": "National Library of Medicine - History of Medicine",
+      "date": "2010-06-03 17:03:49",
+      "licence": "No restrictions",
+      "page": "https://commons.wikimedia.org/wiki/File:Tertia_musculorum_tabula_(37053621276).jpg"
+    },
+    "order": 2
+  },
+  {
+    "id": "ouroboros-eclipse",
+    "title": "Ouroboros Eclipsis",
+    "file": "ouroboros-eclipse.png",
+    "palette": "ink · bone · silver · brass",
+    "category": "eclipse & serpent",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "origin": "procedural",
+    "attribution": null,
+    "order": 3
+  },
+  {
+    "id": "montes-lunae",
+    "title": "Montes Lunae",
+    "file": "montes-lunae.png",
+    "palette": "ink · bone · silver",
+    "category": "landscape & lunar",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "origin": "procedural",
+    "attribution": null,
+    "order": 4
+  },
+  {
+    "id": "oculus",
+    "title": "Oculus Mundi",
+    "file": "oculus.png",
+    "palette": "ink · bone · brass",
+    "category": "occult geometry",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "origin": "procedural",
+    "attribution": null,
+    "order": 5
+  },
+  {
+    "id": "empyrean",
+    "title": "The Empyrean",
+    "file": "empyrean.png",
+    "palette": "ink · parchment",
+    "category": "celestial",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "origin": "public-domain composite",
+    "attribution": {
+      "title": "Paradiso Canto 31 (no caption).jpg",
+      "artist": "Gustave Doré",
+      "date": "19th centurydate QS:P,+1850-00-00T00:00:00Z/7",
+      "licence": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Paradiso_Canto_31_(no_caption).jpg"
+    },
+    "order": 6
+  },
+  {
+    "id": "macrocosm",
+    "title": "Macrocosmus",
+    "file": "macrocosm.png",
+    "palette": "ink · bone · brass · silver",
+    "category": "hermetic diagram",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "origin": "public-domain composite",
+    "attribution": {
+      "title": "UtriusqueCosmiMacrocosm.png",
+      "artist": "Robert Fludd",
+      "date": "1621",
+      "licence": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:UtriusqueCosmiMacrocosm.png"
+    },
+    "order": 7
+  },
+  {
+    "id": "selenographia",
+    "title": "Selenographia",
+    "file": "selenographia.png",
+    "palette": "ink · lunar silver",
+    "category": "lunar",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "origin": "public-domain composite",
+    "attribution": {
+      "title": "Normal lunar crater - J. Nasmyth. LCCN2001700463.jpg",
+      "artist": "Nasmyth, James, 1808-1890, photographer",
+      "date": "1874",
+      "licence": "Public domain",
+      "page": "https://commons.wikimedia.org/wiki/File:Normal_lunar_crater_-_J._Nasmyth._LCCN2001700463.jpg"
+    },
+    "order": 8
+  },
+  {
+    "id": "fenestra",
+    "title": "Fenestra",
+    "file": "fenestra.png",
+    "palette": "ink · bone",
+    "category": "your engravings",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "origin": "re-print of user wallpaper",
+    "attribution": null,
+    "order": 9
+  },
+  {
+    "id": "draco",
+    "title": "Draco",
+    "file": "draco.png",
+    "palette": "ink · bone",
+    "category": "your engravings",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "origin": "re-print of user wallpaper",
+    "attribution": null,
+    "order": 10
+  },
+  {
+    "id": "trigonum",
+    "title": "Trigonum",
+    "file": "trigonum.png",
+    "palette": "ink · bone",
+    "category": "your engravings",
+    "aspect": "16:9",
+    "size": [
+      1920,
+      1080
+    ],
+    "origin": "re-print of user wallpaper",
+    "attribution": null,
+    "order": 11
+  }
+]
