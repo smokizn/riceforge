@@ -1,0 +1,1 @@
+-- original look: no overrides. hyprlua/*.lua and custom/*.lua apply as before.

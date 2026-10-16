@@ -1,0 +1,66 @@
+/* ETCH · swaync
+   Keeps swaync's own stylesheet for structure and re-inks it through
+   its CSS variables, so swaync updates don't break the theme. */
+@import url("file:///etc/xdg/swaync/style.css");
+
+:root {
+  --cc-bg: rgba(17, 17, 19, 0.98);
+  --noti-border-color: rgb(42, 42, 46);
+  --noti-bg: 17, 17, 19;
+  --noti-bg-alpha: 0.98;
+  --noti-bg-darker: rgb(10, 10, 11);
+  --noti-bg-hover: rgb(28, 28, 31);
+  --noti-bg-focus: rgba(194, 217, 76, 0.10);
+  --noti-close-bg: rgb(28, 28, 31);
+  --noti-close-bg-hover: rgb(194, 217, 76);
+  --text-color: rgb(180, 180, 184);
+  --text-color-disabled: rgb(107, 107, 112);
+  --bg-selected: rgb(194, 217, 76);
+  --border-radius: 3px;
+  --notification-icon-size: 48px;
+  --notification-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+  --font-size-summary: 14px;
+  --font-size-body: 13px;
+}
+
+* {
+  font-family: "Iosevka Nerd Font", "Iosevka NF", monospace;
+}
+
+/* every notice carries a margin rule; its colour is its urgency */
+.notification-row .notification-background .notification {
+  border-left: 2px solid rgb(107, 107, 112);
+}
+.notification-row .notification-background .notification.low {
+  border-left-color: rgb(42, 42, 46);
+}
+.notification-row .notification-background .notification.critical {
+  border-left-color: rgb(194, 217, 76);
+  background: rgba(194, 217, 76, 0.08);
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .summary {
+  color: rgb(236, 236, 234);
+  font-weight: 600;
+}
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .body {
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+}
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .time {
+  color: rgb(107, 107, 112);
+}
+
+.control-center {
+  border: 1px solid rgb(42, 42, 46);
+  border-top: 2px solid rgb(194, 217, 76);
+}
+.widget-title > label {
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  font-size: 18px;
+  color: rgb(236, 236, 234);
+}
+.widget-dnd switch:checked {
+  background: rgb(194, 217, 76);
+}

@@ -1,0 +1,163 @@
+* {
+    font-family: "JetBrainsMono Nerd Font", "Font Awesome 6 Free", sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+#custom-fan_monitor.low {
+    color: #a6e3a1;
+}
+
+#custom-fan_monitor.medium {
+    color: #f9e2af;
+}
+
+#custom-fan_monitor.high {
+    color: #f38ba8;
+}
+
+window#waybar {
+    background-color: transparent;
+    color: #cccccc; /* Base gray text */
+}
+
+/* Base module background - Dark Gray/Slate */
+#workspaces, #wlr-taskbar, #clock, #cpu, #memory, #network, #bluetooth, #pulseaudio, 
+#backlight, #battery, #tray, #custom-launcher, #custom-power-menu, 
+#custom-spotify, #custom-mic-toggle, #custom-fan_monitor, #group-system {
+    background-color: #1a1a1a; /* Very dark gray */
+    padding: 2px 12px;
+    margin: 4px 3px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Subtle border for depth */
+}
+
+#group-system {
+    padding: 2px 8px;
+}
+
+#group-system .system-item {
+    margin-left: 4px;
+}
+
+#custom-fan {
+    color: #999999; /* Grey to match your theme */
+    background-color: #1a1a1a;
+    padding: 2px 12px;
+    margin: 4px 3px;
+    border-radius: 10px;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#custom-fan:hover {
+    background-color: #2a2a2a;
+    color: #ffffff; /* Turns white on hover like CPU/RAM */
+}
+
+#custom-hb {
+    color: #999999; /* Grey to match your theme */
+    background-color: #1a1a1a;
+    padding: 2px 12px;
+    margin: 4px 3px;
+    border-radius: 10px;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#custom-hb:hover {
+    background-color: #2a2a2a;
+    color: #ffffff; /* Turns white on hover like CPU/RAM */
+}
+
+#custom-hb.shooting {
+    color: #ff5555; /* Red color when shooting */
+}
+#custom-gun.shooting {
+    font-size: 20px;
+}
+
+#custom-bullet.bullet {
+    font-size: 18px;
+}
+
+#custom-bullet.impact {
+    font-size: 22px;
+}
+@keyframes flash {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+#custom-gun.shooting {
+  animation: flash 0.1s ease-in-out;
+}
+
+
+#cpu, #memory, #custom-spotify {
+    padding: 2px 8px;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#cpu label, #memory label, #custom-spotify label {
+    font-size: 0px; 
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#cpu:hover, #memory:hover, #custom-spotify:hover {
+    padding: 2px 14px;
+    background-color: #2a2a2a; 
+}
+
+#cpu:hover label, #memory:hover label, #custom-spotify:hover label {
+    font-size: 14px; 
+    margin-left: 6px;
+    color: #ffffff; 
+}
+/* ---------------------------- */
+
+/* Workspaces */
+#workspaces button {
+    color: #666666; 
+    padding: 0 4px;
+    transition: all 0.2s ease;
+}
+
+#workspaces button.active {
+    color: #ffffff; /* Pure white for active */
+    font-size: 16px;
+    text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.3); /* Slight white glow */
+}
+
+/* Actual App Images Taskbar */
+#wlr-taskbar {
+    padding: 2px 6px;
+}
+#wlr-taskbar button {
+    padding: 0 2px;
+    margin: 0 1px;
+}
+#wlr-taskbar button.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+/* Accents (Muted to fit the gray theme) */
+#custom-launcher { color: #ffffff; font-size: 18px; padding: 2px 16px;}
+#custom-power-menu { color: #999999; font-size: 18px; padding: 2px 16px;}
+#custom-power-menu:hover { background-color: #dddddd; color: #1a1a1a; }
+#custom-spotify { color: #888888; }
+#custom-spotify:hover { color: #1db954; } /* Shows Spotify green only on hover */
+
+#custom-mic-toggle {
+    color: #888888;
+    transition: all 0.3s ease;
+}
+
+#custom-mic-toggle:hover {
+    color: #ffffff;
+    background-color: #2a2a2a;
+}
+
+#battery.critical:not(.charging) { color: #ff5555; } /* Keep critical battery red for safety */

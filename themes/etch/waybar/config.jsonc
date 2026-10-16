@@ -1,0 +1,235 @@
+// ETCH · waybar as a running head
+// left: the mark and the folios · centre: the hour · right: the instruments
+{
+    "layer": "top",
+    "position": "top",
+    "height": 30,
+    "margin-top": 0,
+    "margin-left": 0,
+    "margin-right": 0,
+    "spacing": 0,
+
+    "modules-left": [
+        "custom/etch",
+        "hyprland/workspaces",
+        "wlr/taskbar",
+        "custom/bullet",
+        "custom/hb"
+    ],
+    "modules-center": [
+        "clock",
+        "custom/hora"
+    ],
+    "modules-right": [
+        "custom/spotify",
+        "group/system",
+        "pulseaudio",
+        "custom/mic-toggle",
+        "backlight",
+        "bluetooth",
+        "battery",
+        "tray",
+        "custom/power-menu"
+    ],
+
+    // ¶ the pilcrow mark. opens walker.
+    "custom/etch": {
+        "format": "¶",
+        "tooltip-format": "Walker",
+        "on-click": "walker",
+        "on-click-right": "walker -m providerlist"
+    },
+
+    // folios in lower-case roman numerals, as a printer numbers plates
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "all-outputs": true,
+        "sort-by-number": true,
+        "format-icons": {
+            "1": "i", "2": "ii", "3": "iii", "4": "iv", "5": "v",
+            "6": "vi", "7": "vii", "8": "viii", "9": "ix", "10": "x",
+            "default": "·"
+        },
+        "persistent-workspaces": { "*": 5 }
+    },
+
+    "wlr/taskbar": {
+        "format": "{icon}",
+        "icon-size": 14,
+        "tooltip-format": "{title}",
+        "spacing": 0,
+        "on-click": "activate",
+        "on-click-middle": "close",
+        "ignore-list": ["Alacritty", "kitty"],
+        "app_ids-mapping": {
+            "firefoxdeveloperedition": "firefox-developer-edition"
+        }
+    },
+
+    "custom/bullet": {
+        "format": "{}",
+        "return-type": "json",
+        "exec": "cat /tmp/waybar_bullet_state.json 2>/dev/null || echo '{\"text\": \" \", \"class\": \"hidden\"}'",
+        "exec-on-event": false,
+        "signal": 9
+    },
+
+    "custom/hb": {
+        "format": "🍑",
+        "return-type": "json",
+        "exec": "cat /tmp/waybar_gun_state.json || echo '{\"text\": \"\", \"class\": \"idle\"}'",
+        "exec-on-event": false,
+        "on-click": "~/.config/waybar/scripts/gun.sh",
+        "signal": 8
+    },
+
+    "clock": {
+        "interval": 60,
+        "format": "{:%H:%M}",
+        "format-alt": "{:%A, %d %B}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "weeks-pos": "",
+            "format": {
+                "months":   "<span color='#ececea'><i>{}</i></span>",
+                "weekdays": "<span color='#6b6b70'>{}</span>",
+                "days":     "<span color='#b4b4b8'>{}</span>",
+                "today":    "<span color='#c2d94c'><b><u>{}</u></b></span>"
+            }
+        }
+    },
+
+    // the canonical hour beside the clock. one bash call a minute.
+    "custom/hora": {
+        "exec": "~/.config/riceforge/current/bin/hora.sh",
+        "return-type": "json",
+        "interval": 60,
+        "format": "{}"
+    },
+
+    "custom/spotify": {
+        "exec": "python3 ~/.config/waybar/scripts/mediaplayer.py --player spotify",
+        "format": "󰝚 {}",
+        "return-type": "json",
+        "on-click": "playerctl --player=spotify play-pause",
+        "on-double-click-right": "playerctl --player=spotify next",
+        "on-scroll-up": "playerctl --player=spotify next",
+        "on-scroll-down": "playerctl --player=spotify previous"
+    },
+
+    // cpu is the cover; hover opens memory, fan reading and fan toggle
+    "group/system": {
+        "orientation": "inherit",
+        "drawer": {
+            "transition-duration": 240,
+            "children-class": "system-item",
+            "transition-left-to-right": false
+        },
+        "modules": ["cpu", "memory", "custom/fan_monitor", "custom/fan"]
+    },
+
+    "cpu": {
+        "interval": 5,
+        "format": "cpu {usage}"
+    },
+
+    "memory": {
+        "interval": 10,
+        "format": "mem {percentage}",
+        "tooltip-format": "{used:0.1f} / {total:0.1f} GiB"
+    },
+
+    "custom/fan_monitor": {
+        "exec": "~/.config/hypr/hyprland/scripts/fan_monitor.sh",
+        "return-type": "json",
+        "interval": 3,
+        "tooltip": true
+    },
+
+    "custom/fan": {
+        "format": "󰈐",
+        "on-click": "python3 ~/.config/hypr/hyprland/scripts/fan_toggle.py",
+        "tooltip-format": "Toggle fan: auto / max"
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}",
+        "format-bluetooth": "󰂰 {volume}",
+        "format-muted": "󰝟 —",
+        "format-icons": {
+            "headphone": "󰋋",
+            "hands-free": "󰋋",
+            "headset": "󰋋",
+            "phone": "󰏲",
+            "portable": "󰏲",
+            "car": "󰄋",
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "tooltip-format": "{desc} · {volume}%",
+        "scroll-step": 5,
+        "on-click": "pavucontrol",
+        "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+        "smooth-scrolling-threshold": 1,
+        "max-volume": 150
+    },
+
+    "custom/mic-toggle": {
+        "format": "{}",
+        "exec": "bash ~/.config/waybar/scripts/mic_toggle.sh",
+        "return-type": "json",
+        "on-click": "bash ~/.config/waybar/scripts/mic_toggle_click.sh",
+        "signal": 12
+    },
+
+    // device left unset: waybar finds amdgpu_bl1 itself (the old "DP-1" doesn't exist)
+    "backlight": {
+        "format": "{icon} {percent}",
+        "format-icons": ["󰃞", "󰃟", "󰃠"],
+        "tooltip-format": "Brightness {percent}%",
+        "on-scroll-up": "brightnessctl set 1%+",
+        "on-scroll-down": "brightnessctl set 1%-"
+    },
+
+    "bluetooth": {
+        "format": "󰂯",
+        "format-off": "󰂲",
+        "format-disabled": "󰂲",
+        "format-connected": "󰂱",
+        "tooltip-format": "{controller_alias} · {status}",
+        "tooltip-format-connected": "{device_alias}",
+        "on-click": "bash ~/.config/waybar/scripts/rofi-bluetooth &",
+        "on-click-right": "blueman-manager"
+    },
+
+    "battery": {
+        "interval": 30,
+        "states": { "warning": 30, "critical": 15 },
+        "format": "{icon} {capacity}",
+        "format-charging": "󰂄 {capacity}",
+        "format-plugged": "󰚥 {capacity}",
+        "format-full": "󰁹 full",
+        "format-icons": ["󰁺", "󰁼", "󰁾", "󰂀", "󰁹"],
+        "tooltip-format": "{capacity}% · {timeTo}"
+    },
+
+    "tray": {
+        "icon-size": 14,
+        "spacing": 10
+    },
+
+    // wlogout isn't installed, so this opens waybar's own GTK menu
+    "custom/power-menu": {
+        "format": "󰐥",
+        "tooltip": false,
+        "menu": "on-click",
+        "menu-file": "~/.config/riceforge/current/waybar/power_menu.xml",
+        "menu-actions": {
+            "lock": "pidof hyprlock || hyprlock",
+            "suspend": "systemctl suspend",
+            "reload": "hyprctl reload",
+            "reboot": "systemctl reboot",
+            "shutdown": "systemctl poweroff"
+        }
+    }
+}

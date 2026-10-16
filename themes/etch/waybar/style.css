@@ -1,0 +1,181 @@
+/* ETCH · running head
+   graphite plates, zinc greys, one mordant accent.
+   ink #0a0a0b · rule #2a2a2e · faded #6b6b70 · silver #b4b4b8 · paper #ececea
+   lichen #c2d94c (focus only) · rose #d35d6e (critical only) · moss #8a9a52 (charging) */
+
+@define-color ink       #0a0a0b;
+@define-color page      #111113;
+@define-color rule      #2a2a2e;
+@define-color faded     #6b6b70;
+@define-color silver      #b4b4b8;
+@define-color paper    #ececea;
+@define-color lichen #c2d94c;
+@define-color rose      #d35d6e;
+@define-color moss #8a9a52;
+
+* {
+    font-family: "Iosevka Nerd Font", "Iosevka NF", monospace;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+window#waybar {
+    background-color: alpha(@ink, 0.97);
+    border-bottom: 1px solid @rule;
+    color: @silver;
+}
+
+tooltip {
+    background: @page;
+    border: 1px solid @rule;
+    border-top: 2px solid @lichen;
+    border-radius: 2px;
+}
+tooltip label {
+    color: @silver;
+    padding: 4px 6px;
+}
+
+/* every instrument is plain type on the page; no pills */
+#custom-etch, #workspaces, #taskbar, #clock, #custom-hora, #custom-spotify,
+#cpu, #memory, #custom-fan_monitor, #custom-fan, #pulseaudio, #custom-mic-toggle,
+#backlight, #bluetooth, #battery, #tray, #custom-power-menu, #custom-hb, #custom-bullet {
+    padding: 0 10px;
+    margin: 0;
+    background: transparent;
+    color: @silver;
+    transition: color 120ms ease-out, box-shadow 160ms ease-out;
+}
+
+/* hover: the line is bitten in */
+#custom-etch:hover, #clock:hover, #custom-spotify:hover, #cpu:hover, #memory:hover,
+#custom-fan_monitor:hover, #custom-fan:hover, #pulseaudio:hover, #custom-mic-toggle:hover,
+#backlight:hover, #bluetooth:hover, #battery:hover, #custom-power-menu:hover, #custom-hb:hover {
+    color: @paper;
+    box-shadow: inset 0 -2px @lichen;
+}
+
+/* ¶ the mark */
+#custom-etch {
+    color: @lichen;
+    font-family: "Noto Serif", serif;
+    font-size: 17px;
+    padding: 0 14px 0 18px;
+}
+#custom-etch:hover { color: @paper; }
+
+/* folios */
+#workspaces { padding: 0 4px; }
+#workspaces button {
+    font-family: "Noto Serif", serif;
+    font-style: italic;
+    font-size: 14px;
+    color: @faded;
+    background: transparent;
+    padding: 0 7px;
+    margin: 0;
+    min-width: 14px;
+    transition: color 160ms ease-out, box-shadow 200ms ease-out;
+}
+#workspaces button.empty  { color: #45454b; }
+#workspaces button:hover  { color: @paper; background: transparent; box-shadow: inset 0 -1px @faded; }
+#workspaces button.active {
+    color: @lichen;
+    box-shadow: inset 0 -2px @lichen;
+}
+#workspaces button.urgent { color: @rose; }
+
+/* the taskbar is quieter than the folios: icons dimmed until focused */
+#taskbar { padding: 0 6px; }
+#taskbar button {
+    padding: 0 5px;
+    background: transparent;
+    -gtk-icon-effect: dim;
+    opacity: 0.55;
+    transition: opacity 160ms ease-out, box-shadow 160ms ease-out;
+}
+#taskbar button:hover  { opacity: 0.9; background: transparent; }
+#taskbar button.active { opacity: 1; -gtk-icon-effect: none; box-shadow: inset 0 -2px @lichen; }
+
+/* the hour: numerals bright, canonical hour as a small-caps gloss */
+#clock {
+    color: @paper;
+    font-size: 13px;
+    font-weight: 600;
+    padding-right: 6px;
+}
+#custom-hora {
+    color: @faded;
+    font-family: "Noto Serif", serif;
+    font-style: italic;
+    font-size: 12px;
+    padding-left: 0;
+}
+#custom-hora.vigils, #custom-hora.compline { color: #48484d; }
+
+/* marginalia: the track title only appears when you reach for it */
+#custom-spotify { color: @faded; }
+#custom-spotify label { font-size: 0; transition: font-size 200ms ease-out; }
+#custom-spotify:hover label {
+    font-size: 12px;
+    font-family: "Noto Serif", serif;
+    font-style: italic;
+}
+
+/* system drawer: lower-case labels, figures in bone */
+#cpu, #memory { color: @faded; }
+#cpu:hover, #memory:hover { color: @paper; }
+.system-item { color: @faded; }
+#custom-fan_monitor.low    { color: @faded; }
+#custom-fan_monitor.medium { color: @paper; }
+#custom-fan_monitor.high   { color: @rose; }
+
+#pulseaudio.muted, #custom-mic-toggle { color: @faded; }
+#bluetooth.off, #bluetooth.disabled { color: @rule; }
+#bluetooth.connected { color: @silver; }
+
+#battery.charging, #battery.plugged { color: @moss; }
+#battery.warning:not(.charging) { color: @paper; box-shadow: inset 0 -1px @faded; }
+#battery.critical:not(.charging) {
+    color: @rose;
+    box-shadow: inset 0 -2px @rose;
+}
+
+#tray { padding: 0 8px; }
+#tray > .passive { -gtk-icon-effect: dim; }
+#tray > .needs-attention { -gtk-icon-effect: highlight; }
+
+#custom-power-menu { color: @faded; padding: 0 18px 0 12px; }
+#custom-power-menu:hover { color: @lichen; box-shadow: none; }
+
+/* the 🍑 rides along untouched, just quieter */
+#custom-hb { padding: 0 8px; }
+#custom-hb.shooting { color: @rose; }
+#custom-bullet.bullet { font-size: 16px; }
+#custom-bullet.impact { font-size: 19px; }
+
+/* waybar's GTK menus (power) */
+menu {
+    background: @page;
+    border: 1px solid @rule;
+    border-top: 2px solid @lichen;
+    border-radius: 2px;
+    padding: 4px 0;
+}
+menuitem {
+    color: @silver;
+    padding: 6px 18px;
+    font-family: "Noto Serif", serif;
+    font-style: italic;
+}
+menuitem:hover {
+    background: alpha(@lichen, 0.10);
+    color: @paper;
+    box-shadow: inset 2px 0 @lichen;
+}
+menu separator { background: @rule; min-height: 1px; margin: 4px 0; }

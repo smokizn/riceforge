@@ -1,0 +1,234 @@
+/* ETCH · walker
+   A single proof laid on the bench. Colour returns only where
+   attention is: icons are greyscale until the row is selected. */
+
+@define-color ink       #0a0a0b;
+@define-color page      #111113;
+@define-color raised    #18181b;
+@define-color rule      #2a2a2e;
+@define-color faded     #6b6b70;
+@define-color silver      #b4b4b8;
+@define-color paper    #ececea;
+@define-color lichen #c2d94c;
+@define-color rose      #d35d6e;
+
+/* names walker's own widgets expect */
+@define-color window_bg_color #111113;
+@define-color accent_bg_color #c2d94c;
+@define-color theme_fg_color  #b4b4b8;
+@define-color error_bg_color  #c2d94c;
+@define-color error_fg_color  #ececea;
+
+* {
+  all: unset;
+  font-family: "Iosevka Nerd Font", "Iosevka NF", monospace;
+}
+
+.box-wrapper {
+  background: @page;
+  padding: 22px 26px 16px 26px;
+  border: 1px solid @rule;
+  border-top: 2px solid @lichen;
+  border-radius: 3px;
+  box-shadow: 0 28px 70px alpha(black, 0.65);
+}
+
+/* ¶ quaere */
+.etch-header {
+  margin-bottom: 2px;
+}
+.etch-mark {
+  color: @lichen;
+  font-family: "Noto Serif", serif;
+  font-size: 18px;
+}
+.etch-title {
+  color: @faded;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+/* the search line is a ruled line, not a box */
+.search-container {
+  border-radius: 0;
+}
+.input {
+  color: @paper;
+  caret-color: @lichen;
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  font-size: 22px;
+  padding: 4px 2px 12px 2px;
+  border-bottom: 1px solid @rule;
+}
+.input:focus-within {
+  border-bottom-color: alpha(@lichen, 0.7);
+}
+.input placeholder {
+  color: @faded;
+  opacity: 0.6;
+}
+.input selection {
+  background: alpha(@lichen, 0.35);
+  color: @paper;
+}
+
+.content-container {
+  margin-top: 6px;
+}
+.list {
+  color: @silver;
+}
+scrollbar {
+  opacity: 0;
+}
+
+.normal-icons { -gtk-icon-size: 18px; }
+.large-icons  { -gtk-icon-size: 30px; }
+
+/* rows: a 2px margin rule turns lichen on the selected entry */
+.item-box {
+  padding: 8px 12px;
+  border-radius: 2px;
+  border-left: 2px solid transparent;
+  transition: background 120ms ease-out, border-color 120ms ease-out;
+}
+.item-image {
+  -gtk-icon-filter: grayscale(1) opacity(0.65);
+  margin-right: 4px;
+}
+.item-text {
+  font-size: 14px;
+  color: @silver;
+}
+.item-subtext {
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  font-size: 12px;
+  color: @faded;
+}
+
+child:selected .item-box,
+row:selected .item-box {
+  background: alpha(@lichen, 0.07);
+  border-left-color: @lichen;
+}
+child:selected .item-image,
+row:selected .item-image {
+  -gtk-icon-filter: none;
+}
+child:selected .item-text,
+row:selected .item-text {
+  color: @paper;
+}
+child:selected .item-subtext,
+row:selected .item-subtext {
+  color: @silver;
+}
+
+.item-image-text {
+  font-size: 26px;
+  color: @silver;
+}
+
+/* F1–F4 quick keys as small printer's sorts */
+.item-quick-activation {
+  font-size: 10px;
+  color: @faded;
+  padding: 1px 6px;
+  border: 1px solid @rule;
+  border-radius: 2px;
+}
+child:selected .item-quick-activation,
+row:selected .item-quick-activation {
+  color: @lichen;
+  border-color: alpha(@lichen, 0.5);
+}
+
+.providerlist .item-subtext {
+  opacity: 1;
+}
+
+/* = calc: the answer is bitten in */
+.calc .item-text {
+  font-family: "Noto Serif", serif;
+  font-size: 28px;
+  color: @lichen;
+}
+.calc .item-subtext {
+  font-style: normal;
+  font-family: "Iosevka Nerd Font", monospace;
+}
+
+.symbols .item-image,
+.symbols .item-image-text {
+  font-size: 22px;
+}
+
+.todo.done .item-text-box { opacity: 0.3; }
+.todo.urgent .item-text    { color: @rose; }
+.todo.active               { font-weight: bold; }
+.bluetooth.disconnected    { opacity: 0.5; }
+
+:not(.calc).current .item-text {
+  font-style: italic;
+  color: @paper;
+}
+
+.placeholder,
+.elephant-hint {
+  color: @faded;
+  font-family: "Noto Serif", serif;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.preview {
+  border: 1px solid @rule;
+  border-radius: 2px;
+  padding: 10px;
+  color: @silver;
+  background: @ink;
+}
+.preview .large-icons { -gtk-icon-size: 64px; }
+.preview-content.archlinuxpkgs,
+.preview-content.dnfpackages,
+.preview-content.aptpackages {
+  font-family: "Iosevka Nerd Font", monospace;
+}
+
+/* footer: keybind hints as a colophon */
+.keybinds {
+  padding-top: 10px;
+  border-top: 1px solid @rule;
+  font-size: 11px;
+  color: @faded;
+}
+.keybind-button        { opacity: 0.7; }
+.keybind-button:hover  { opacity: 1; color: @paper; }
+.keybind-bind          { color: @faded; text-transform: lowercase; }
+.keybind-label {
+  padding: 1px 6px;
+  border-radius: 2px;
+  border: 1px solid @rule;
+  color: @silver;
+}
+
+/* actions submenu */
+popover {
+  background: @page;
+  border: 1px solid @rule;
+  border-top: 2px solid @lichen;
+  border-radius: 3px;
+  padding: 8px;
+  box-shadow: 0 16px 40px alpha(black, 0.6);
+}
+
+.error {
+  padding: 10px;
+  background: alpha(@lichen, 0.15);
+  color: @paper;
+  border-left: 2px solid @lichen;
+  border-radius: 2px;
+}

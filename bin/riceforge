@@ -1,0 +1,241 @@
+#!/usr/bin/env bash
+# riceforge: switch whole-desktop looks without losing the setup underneath.
+#
+#   riceforge list                 themes available
+#   riceforge status               active theme and link health
+#   riceforge verify [theme]       validate a theme without applying it
+#   riceforge apply <theme>        verify, switch, live-reload
+#   riceforge revert               apply "original" (your look before riceforge)
+#   riceforge preview-bar <theme>  show that theme's waybar for 8s (no focus grab)
+#   riceforge detach               remove riceforge entirely; restore plain files
+#
+# Each managed file in ~/.config is a symlink into ~/.config/riceforge/current,
+# which in turn points at themes/<name>. Behaviour (binds, execs, rules) is never
+# managed here: themes only carry looks.
+set -euo pipefail
+
+RF="$HOME/.config/riceforge"
+CFG="$HOME/.config"
+THEMES="$RF/themes"
+CURRENT="$RF/current"
+MARK_BEGIN="-- >>> riceforge theme layer >>>"
+MARK_END="-- <<< riceforge theme layer <<<"
+
+# managed link  ->  path inside a theme
+LINKS=(
+    "hypr/riceforge.lua:hypr.lua"
+    "hypr/hyprlock.conf:hyprlock.conf"
+    "waybar/config.jsonc:waybar/config.jsonc"
+    "waybar/style.css:waybar/style.css"
+    "kitty/riceforge-theme.conf:kitty.conf"
+    "swaync/style.css:swaync.css"
+)
+
+c_red=$'\e[38;2;194;217;76m'; c_dim=$'\e[38;2;107;107;112m'; c_off=$'\e[0m'
+say()  { printf '%s¶%s %s\n' "$c_red" "$c_off" "$*"; }
+note() { printf '  %s%s%s\n' "$c_dim" "$*" "$c_off"; }
+die()  { printf '%s¶ error:%s %s\n' "$c_red" "$c_off" "$*" >&2; exit 1; }
+
+theme_dir() { [[ -d "$THEMES/$1" ]] || die "no theme '$1' (try: riceforge list)"; echo "$THEMES/$1"; }
+active()    { [[ -L "$CURRENT" ]] && basename "$(readlink "$CURRENT")" || echo "none"; }
+attached()  { grep -qF -- "$MARK_BEGIN" "$CFG/hypr/hyprland.lua"; }
+
+verify_hypr() {  # $1 = lua file
+    local out
+    out=$(Hyprland --verify-config -c "$1" 2>&1 | sed -n '/Config parsing result/,$p' | tail -n +3)
+    [[ "$out" == "config ok" ]] || { echo "$out" >&2; return 1; }
+}
+
+verify_css() {  # $1 = gtk version, $2 = file
+    python3 -I - "$1" "$2" <<'PY'
+import sys, gi
+ver, path = sys.argv[1], sys.argv[2]
+gi.require_version('Gtk', ver)
+from gi.repository import Gtk
+errs = []
+p = Gtk.CssProvider()
+p.connect('parsing-error', lambda _p, sec, err: errs.append(f"{sec.to_string()}: {err.message}"))
+data = open(path).read()
+p.load_from_string(data) if ver == '4.0' else p.load_from_data(data.encode())
+if errs:
+    print("\n".join(errs), file=sys.stderr); sys.exit(1)
+PY
+}
+
+cmd_verify() {
+    local t="${1:-$(active)}" d; d=$(theme_dir "$t")
+    say "verifying '$t'"
+    verify_hypr "$d/hypr.lua" && note "hyprland layer ok"
+    python3 -I -c 'import json,re,sys; s=open(sys.argv[1]).read(); s=re.sub(r"^\s*//.*$","",s,flags=re.M); json.loads(s)' \
+        "$d/waybar/config.jsonc" 2>/dev/null && note "waybar config parses" \
+        || note "waybar config: has inline comments, json check skipped"
+    verify_css 3.0 "$d/waybar/style.css" && note "waybar css ok (gtk3)"
+    verify_css 4.0 "$d/swaync.css" && note "swaync css ok (gtk4)"
+    if [[ -f "$d/walker/style.css" ]]; then verify_css 4.0 "$d/walker/style.css" && note "walker css ok (gtk4)"; fi
+    [[ -e "$d/wallpaper.png" ]] && note "wallpaper present" || die "wallpaper missing"
+}
+
+cmd_attach() {
+    attached && return 0
+    say "attaching riceforge (one-time)"
+    local stamp; stamp=$(date +%Y%m%d-%H%M%S)
+    mkdir -p "$RF/backups/attach-$stamp"
+    for pair in "${LINKS[@]}"; do
+        local rel="${pair%%:*}"
+        [[ -e "$CFG/$rel" && ! -L "$CFG/$rel" ]] && cp -a "$CFG/$rel" "$RF/backups/attach-$stamp/$(echo "$rel" | tr / _)"
+    done
+    cp -a "$CFG/hypr/hyprland.lua" "$CFG/hypr/hyprlua/execs.lua" "$CFG/kitty/kitty.conf" "$CFG/walker/config.toml" "$RF/backups/attach-$stamp/"
+    note "pre-attach copies in backups/attach-$stamp"
+
+    # hyprland.lua: load the theme layer last, just before shell overrides
+    python3 -I - "$CFG/hypr/hyprland.lua" "$MARK_BEGIN" "$MARK_END" <<'PY'
+import sys
+path, b, e = sys.argv[1:4]
+s = open(path).read()
+block = (f"{b}\n"
+         'if is_file_exists(HOME .. "/.config/hypr/riceforge.lua") then\n'
+         '    require("riceforge")\n'
+         f"end\n{e}\n\n")
+anchor = "-- Shell overrides"
+s = s.replace(anchor, block + anchor, 1) if anchor in s else s + "\n" + block
+open(path, "w").write(s)
+PY
+    # wallpaper follows the active theme
+    sed -i 's|hl.exec_cmd("swaybg -i /home/smoke/Pictures/Wallpapers/wallhaven-zpvqyj.png")|hl.exec_cmd("swaybg -m fill -i /home/smoke/.config/riceforge/current/wallpaper.png") -- riceforge|' \
+        "$CFG/hypr/hyprlua/execs.lua"
+    # kitty picks up the theme fragment if present
+    grep -qxF -- "globinclude riceforge-*.conf" "$CFG/kitty/kitty.conf" || printf '\nglobinclude riceforge-*.conf\n' >> "$CFG/kitty/kitty.conf"
+    mkdir -p "$CFG/swaync"
+}
+
+link_all() {
+    for pair in "${LINKS[@]}"; do
+        local rel="${pair%%:*}" src="${pair#*:}"
+        ln -sfn "$CURRENT/$src" "$CFG/$rel"
+    done
+    for d in "$THEMES"/*/walker; do
+        [[ -d "$d" ]] && ln -sfn "$d" "$CFG/walker/themes/$(basename "$(dirname "$d")")"
+    done
+    return 0
+}
+
+# walker is a GApplication: a new service started before the old one has
+# released its D-Bus name just forwards to it and exits, so wait first.
+restart_walker() {
+    pkill -x walker || true
+    for _ in $(seq 20); do pgrep -x walker >/dev/null || break; sleep 0.1; done
+    setsid -f walker --gapplication-service >/dev/null 2>&1
+    sleep 0.5; pgrep -x walker >/dev/null
+}
+
+reload_all() {
+    local walker_theme="$1" old_walker_theme="$2"
+    hyprctl reload >/dev/null && note "hyprland reloaded"
+    pgrep -x waybar >/dev/null && pkill -SIGUSR2 -x waybar && note "waybar reloaded"
+    pgrep -x swaync >/dev/null && swaync-client -rs >/dev/null 2>&1 && note "swaync restyled"
+    pgrep -x kitty >/dev/null && pkill -SIGUSR1 -x kitty && note "kitty reloaded"
+    pkill -x swaybg || true
+    setsid -f swaybg -m fill -i "$CURRENT/wallpaper.png" >/dev/null 2>&1 && note "wallpaper set"
+    if [[ "$walker_theme" != "$old_walker_theme" ]]; then
+        # walker only scans themes at start; elephant must own a live socket first
+        if [[ ! -S "${XDG_RUNTIME_DIR:-/run/user/$UID}/elephant/elephant.sock" ]]; then
+            pkill -x elephant || true; setsid -f elephant >/dev/null 2>&1; sleep 1
+            note "elephant restarted (its socket was missing)"
+        fi
+        restart_walker && note "walker service restarted"
+    fi
+}
+
+cmd_apply() {
+    local t="${1:?usage: riceforge apply <theme>}" d prev old_wt new_wt
+    d=$(theme_dir "$t")
+    cmd_verify "$t"
+    cmd_attach
+    prev=$(readlink "$CURRENT" 2>/dev/null || true)
+    old_wt=$(sed -n 's/^theme = "\([^"]*\)".*/\1/p' "$CFG/walker/config.toml")
+    new_wt=$(. "$d/theme.env"; echo "$WALKER_THEME")
+
+    ln -sfn "themes/$t" "$CURRENT"
+    link_all
+    if ! verify_hypr "$CFG/hypr/hyprland.lua"; then
+        [[ -n "$prev" ]] && ln -sfn "$prev" "$CURRENT"
+        die "full hyprland config failed with '$t'; kept previous theme"
+    fi
+    note "full hyprland config ok"
+    sed -i "s/^theme = \"[^\"]*\"/theme = \"$new_wt\"/" "$CFG/walker/config.toml"
+    reload_all "$new_wt" "$old_wt"
+    say "active: $t"
+}
+
+cmd_status() {
+    say "active theme: $(active)"
+    attached && note "attached to hyprland.lua" || note "not attached"
+    for pair in "${LINKS[@]}"; do
+        local rel="${pair%%:*}"
+        if [[ -L "$CFG/$rel" ]]; then
+            [[ -e "$CFG/$rel" ]] && note "ok      $rel" || note "BROKEN  $rel"
+        else
+            note "plain   $rel"
+        fi
+    done
+    note "walker theme: $(sed -n 's/^theme = "\([^"]*\)".*/\1/p' "$CFG/walker/config.toml")"
+}
+
+cmd_list() {
+    local a; a=$(active)
+    for d in "$THEMES"/*/; do
+        local n; n=$(basename "$d")
+        local desc; desc=$(. "$d/theme.env" 2>/dev/null; echo "${DESCRIPTION:-}")
+        [[ "$n" == "$a" ]] && printf '%s* %-10s%s %s\n' "$c_red" "$n" "$c_off" "$desc" \
+                           || printf '  %-10s %s\n' "$n" "$desc"
+    done
+}
+
+cmd_preview_bar() {
+    local d; d=$(theme_dir "${1:?usage: riceforge preview-bar <theme>}")
+    say "showing $1's bar for ${2:-8}s alongside yours"
+    timeout "${2:-8}" waybar -c "$d/waybar/config.jsonc" -s "$d/waybar/style.css" -l error >/dev/null 2>&1 || true
+}
+
+cmd_detach() {
+    say "detaching riceforge; restoring 'original' as plain files"
+    local o="$THEMES/original"
+    for pair in "${LINKS[@]}"; do rm -f "$CFG/${pair%%:*}"; done
+    cp -a "$o/waybar/config.jsonc" "$o/waybar/style.css" "$CFG/waybar/"
+    cp -a "$o/hyprlock.conf" "$CFG/hypr/hyprlock.conf"
+    python3 -I - "$CFG/hypr/hyprland.lua" "$MARK_BEGIN" "$MARK_END" <<'PY'
+import re, sys
+path, b, e = sys.argv[1:4]
+s = open(path).read()
+s = re.sub(re.escape(b) + r".*?" + re.escape(e) + r"\n\n?", "", s, flags=re.S)
+open(path, "w").write(s)
+PY
+    sed -i 's|hl.exec_cmd("swaybg -m fill -i /home/smoke/.config/riceforge/current/wallpaper.png") -- riceforge|hl.exec_cmd("swaybg -i /home/smoke/Pictures/Wallpapers/wallhaven-zpvqyj.png")|' \
+        "$CFG/hypr/hyprlua/execs.lua"
+    sed -i '/^globinclude riceforge-\*\.conf$/d' "$CFG/kitty/kitty.conf"
+    for d in "$THEMES"/*/walker; do rm -f "$CFG/walker/themes/$(basename "$(dirname "$d")")"; done
+    local old_wt; old_wt=$(sed -n 's/^theme = "\([^"]*\)".*/\1/p' "$CFG/walker/config.toml")
+    sed -i 's/^theme = "[^"]*"/theme = "default"/' "$CFG/walker/config.toml"
+    rm -f "$CURRENT"
+    verify_hypr "$CFG/hypr/hyprland.lua" && note "hyprland config ok"
+    hyprctl reload >/dev/null
+    pkill -SIGUSR2 -x waybar || true
+    swaync-client -rs >/dev/null 2>&1 || true
+    pkill -SIGUSR1 -x kitty || true
+    pkill -x swaybg || true; setsid -f swaybg -i "$HOME/Pictures/Wallpapers/wallhaven-zpvqyj.png" >/dev/null 2>&1
+    [[ "$old_wt" != "default" ]] && restart_walker
+    say "detached. themes stay in $THEMES; delete that folder to remove riceforge completely"
+}
+
+case "${1:-status}" in
+    list)        cmd_list ;;
+    status)      cmd_status ;;
+    verify)      cmd_verify "${2:-}" ;;
+    apply)       cmd_apply "${2:-}" ;;
+    revert)      cmd_apply original ;;
+    preview-bar) cmd_preview_bar "${2:-}" "${3:-}" ;;
+    attach)      cmd_attach ;;
+    detach)      cmd_detach ;;
+    -h|--help|help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//' ;;
+    *) die "unknown command '$1' (riceforge help)" ;;
+esac
