@@ -71,6 +71,14 @@ Fonts: Adwaita Sans (UI), Mona Sans (clock, lock screen), Monaspace Argon + Rado
 Mona Sans and Monaspace need: `sudo pacman -S ttf-mona-sans otf-monaspace`
 (undo: `sudo pacman -Rns ttf-mona-sans otf-monaspace`). Until then everything falls back cleanly.
 
+Terminal: kitty (`themes/nacre/kitty.conf`) in Iosevka Nerd Font Mono on smoked glass, plus a
+native fish prompt (`themes/nacre/fish/theme.fish`): directory and git chips, duration, exit
+status / pipestatus / signal names, venv, jobs, transient past prompts, a one-line greeting.
+It is loaded by `~/.config/fish/conf.d/riceforge.fish` only when the active theme has
+`fish/theme.fish`; everything is session-scoped (`set -g`), so other themes get stock fish.
+Remove the fish layer entirely: `rm ~/.config/fish/conf.d/riceforge.fish`
+(backup of the fish dir before this: `backups/fish-pre-nacre-prompt-2026-10-17.tar.gz`).
+
 Wallpapers: `themes/nacre/tools/make_wallpapers.py OUT_DIR` → fenestra / draco / trigonum.
 Point `themes/nacre/wallpaper.png` at a different one to change it.
 
