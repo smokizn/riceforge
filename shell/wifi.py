@@ -8,6 +8,7 @@ written anywhere by this code.
 import gi
 
 gi.require_version("NM", "1.0")
+gi.require_version("Gtk", "4.0")
 from gi.repository import GLib, Gtk, NM  # noqa: E402
 
 import netlogic as L  # noqa: E402
