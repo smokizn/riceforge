@@ -24,6 +24,15 @@ SRC = HERE / "sources"
 WALLS = Path.home() / "Pictures/Wallpapers"
 FAM = E.serif_family()
 
+# printed credit lines: the work's author, not the digitising institution
+CREDITS = {
+    "flammarion": "after the Flammarion engraving, 1888",
+    "nasmyth-crater": "after James Nasmyth, 1874",
+    "vesalius-musculorum": "after Andreas Vesalius, 1543",
+    "dore-empyrean": "after Gustave Doré",
+    "fludd-macrocosm": "after Robert Fludd, 1617–21",
+}
+
 ZODIAC = ["ARIES", "TAVRVS", "GEMINI", "CANCER", "LEO", "VIRGO",
           "LIBRA", "SCORPIVS", "SAGITTARIVS", "CAPRICORNVS", "AQVARIVS", "PISCES"]
 ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"]
@@ -423,8 +432,7 @@ def main():
         attribution = None
         if source:
             m = src_meta(source)
-            artist = m["artist"].replace("AnonymousUnknown author", "anonymous")
-            credit = f"after {artist.split(',')[0]}"
+            credit = CREDITS.get(source) or f"after {m['artist'].split(',')[0]}"
             attribution = {"title": m["title"], "artist": m["artist"], "date": m["date"],
                            "licence": m["licence"], "page": m["page"]}
 

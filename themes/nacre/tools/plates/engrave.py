@@ -349,28 +349,44 @@ def ink_on(img, mask, colour, strength=1.0):
 def plate_mark(img, inset=26, colour=None, caption=None, credit=None, family=None, inset_top=64):
     """the plate's pressed border, caption and credit line.
 
-    inset_top keeps the top edge of the frame below the bar (50px + margin),
-    so the engraved rules never run behind it.
+    inset_top keeps the frame's top edge below the bar. The rules pass
+    behind the engraving (figures break the border); the lettering never
+    does: it sits on a small ink cartouche so it reads over any hatching.
     """
     h, w = img.shape[:2]
-    v = Vec(w, h)
-    v.cr.set_line_width(1.0)
-    v.cr.rectangle(inset + 0.5, inset_top + 0.5, w - 2 * inset - 1, h - inset - inset_top - 1); v.cr.stroke()
-    v.cr.set_line_width(0.6)
-    v.cr.rectangle(inset + 5.5, inset_top + 5.5, w - 2 * inset - 11, h - inset - inset_top - 11); v.cr.stroke()
-    if caption:
-        v.text(caption, inset + 24, h - inset - 20, 15, family, spacing=2.2)
-    if credit:
-        v.text(credit, w - inset - 24, h - inset - 20, 12, family, anchor="right", slant=True)
-    # the frame passes behind the engraving: figures break out of the plate
-    # use the engraving's region, not single pixels: line art has dark gaps
+    rule = Vec(w, h)
+    rule.cr.set_line_width(1.0)
+    rule.cr.rectangle(inset + 0.5, inset_top + 0.5, w - 2 * inset - 1, h - inset - inset_top - 1); rule.cr.stroke()
+    rule.cr.set_line_width(0.6)
+    rule.cr.rectangle(inset + 5.5, inset_top + 5.5, w - 2 * inset - 11, h - inset - inset_top - 11); rule.cr.stroke()
     lum = img.mean(axis=2)
     occupied = blur(np.clip((lum - 40) / 40, 0, 1), 7)
     behind = 1 - np.clip(occupied * 4, 0, 1)
-    return ink_on(img, v.mask() * behind, colour if colour is not None else STONE_RULE, 0.9)
+    img = ink_on(img, rule.mask() * behind, colour if colour is not None else STONE_RULE, 0.9)
+
+    text = Vec(w, h)
+    plates = Vec(w, h)
+    y = h - inset - 20
+    for s_, x, size, anchor, slant, spacing in ((caption, inset + 24, 15, "left", False, 2.2),
+                                                 (credit, w - inset - 24, 12, "right", True, 0.0)):
+        if not s_:
+            continue
+        cr = text.cr
+        cr.select_font_face(family or SERIF_CANDIDATES[0],
+                            cairo.FONT_SLANT_ITALIC if slant else cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+        cr.set_font_size(size)
+        tw = sum(cr.text_extents(ch).x_advance for ch in s_) + spacing * (len(s_) - 1)
+        x0 = x if anchor == "left" else x - tw
+        pc = plates.cr
+        pc.rectangle(x0 - 10, y - size - 4, tw + 20, size + 12)
+        pc.fill()
+        text.text(s_, x, y, size, family, anchor=anchor, spacing=spacing, slant=slant)
+    img = ink_on(img, blur(plates.mask(), 2), INK, 0.82)
+    return ink_on(img, text.mask(), CAPTION, 0.95)
 
 
 STONE_RULE = np.array([96, 92, 86], np.float32)
+CAPTION = np.array([150, 144, 132], np.float32)
 
 
 def save(img, path):
