@@ -7,11 +7,13 @@
 #   riceforge apply <theme>        verify, switch, live-reload
 #   riceforge revert               apply "original" (your look before riceforge)
 #   riceforge preview-bar <theme>  show that theme's waybar for 8s (no focus grab)
+#   riceforge session-start        start the active theme's session (login autostart)
 #   riceforge detach               remove riceforge entirely; restore plain files
 #
 # Each managed file in ~/.config is a symlink into ~/.config/riceforge/current,
-# which in turn points at themes/<name>. Behaviour (binds, execs, rules) is never
-# managed here: themes only carry looks.
+# which in turn points at themes/<name>. Behaviour (binds, rules) is never
+# managed here. A theme may ship an executable `session` (start|stop) that owns
+# its long-running helpers (tray applets, wallpaper daemon, shell panels).
 set -euo pipefail
 
 RF="$HOME/.config/riceforge"
@@ -20,6 +22,14 @@ THEMES="$RF/themes"
 CURRENT="$RF/current"
 MARK_BEGIN="-- >>> riceforge theme layer >>>"
 MARK_END="-- <<< riceforge theme layer <<<"
+SESSION_MARK="-- riceforge-session: "
+SESSION_LINE='    hl.exec_cmd("/home/smoke/.config/riceforge/bin/riceforge session-start") -- riceforge-session'
+# autostart lines that now belong to theme sessions (commented, never deleted)
+SESSION_OWNED=(
+    'hl.exec_cmd("nm-applet")'
+    'hl.exec_cmd("blueman-applet")'
+    'hl.exec_cmd("swaybg -m fill -i /home/smoke/.config/riceforge/current/wallpaper.png")'
+)
 
 # managed link  ->  path inside a theme
 LINKS=(
@@ -39,6 +49,11 @@ die()  { printf '%s¶ error:%s %s\n' "$c_red" "$c_off" "$*" >&2; exit 1; }
 theme_dir() { [[ -d "$THEMES/$1" ]] || die "no theme '$1' (try: riceforge list)"; echo "$THEMES/$1"; }
 active()    { [[ -L "$CURRENT" ]] && basename "$(readlink "$CURRENT")" || echo "none"; }
 attached()  { grep -qF -- "$MARK_BEGIN" "$CFG/hypr/hyprland.lua"; }
+has_session() { [[ -x "$THEMES/$1/session" ]]; }
+run_session() {  # $1 theme, $2 start|stop
+    has_session "$1" || return 0
+    "$THEMES/$1/session" "$2" && note "$1 session: $2"
+}
 
 verify_hypr() {  # $1 = lua file
     local out
@@ -72,7 +87,57 @@ cmd_verify() {
     verify_css 3.0 "$d/waybar/style.css" && note "waybar css ok (gtk3)"
     verify_css 4.0 "$d/swaync.css" && note "swaync css ok (gtk4)"
     if [[ -f "$d/walker/style.css" ]]; then verify_css 4.0 "$d/walker/style.css" && note "walker css ok (gtk4)"; fi
+    if [[ -f "$d/shell/style.css" ]]; then verify_css 4.0 "$d/shell/style.css" && note "shell css ok (gtk4)"; fi
+    if [[ -f "$d/session" ]]; then bash -n "$d/session" && note "session hook parses"; fi
+    if [[ -d "$d/icons" ]]; then
+        local bad=0 f
+        for f in "$d"/icons/*.svg; do rsvg-convert "$f" >/dev/null 2>&1 || { echo "bad svg: $f" >&2; bad=1; }; done
+        (( bad )) && die "icon set has invalid svg" || note "icons render"
+    fi
+    if [[ -d "$RF/shell" ]]; then
+        python3 -I -m py_compile "$RF"/shell/*.py && note "shell python compiles"
+    fi
     [[ -e "$d/wallpaper.png" ]] && note "wallpaper present" || die "wallpaper missing"
+}
+
+# autostart: hand applets/wallpaper over to theme sessions (idempotent, reversible)
+migrate_autostart() {
+    local f="$CFG/hypr/hyprlua/execs.lua"
+    grep -qF -- "riceforge session-start" "$f" && return 0
+    cp -a "$f" "$RF/backups/execs.lua.pre-session-$(date +%Y%m%d-%H%M%S)"
+    python3 -I - "$f" "$SESSION_MARK" "$SESSION_LINE" "${SESSION_OWNED[@]}" <<'PY'
+import sys
+path, mark, line, *owned = sys.argv[1:]
+out, done = [], False
+for l in open(path).read().split("\n"):
+    stripped = l.lstrip()
+    if any(stripped.startswith(o) for o in owned):
+        indent = l[:len(l) - len(stripped)]
+        out.append(indent + mark + stripped)
+        if not done:
+            out.append(line); done = True
+        continue
+    out.append(l)
+open(path, "w").write("\n".join(out))
+PY
+    note "autostart now runs 'riceforge session-start' (applet/swaybg lines commented)"
+}
+
+unmigrate_autostart() {
+    local f="$CFG/hypr/hyprlua/execs.lua"
+    python3 -I - "$f" "$SESSION_MARK" <<'PY'
+import sys
+path, mark = sys.argv[1:]
+out = []
+for l in open(path).read().split("\n"):
+    if l.rstrip().endswith("-- riceforge-session") and "session-start" in l:
+        continue
+    s = l.lstrip()
+    if s.startswith(mark):
+        l = l[:len(l) - len(s)] + s[len(mark):]
+    out.append(l)
+open(path, "w").write("\n".join(out))
+PY
 }
 
 cmd_attach() {
@@ -134,9 +199,11 @@ reload_all() {
     pgrep -x waybar >/dev/null && pkill -SIGUSR2 -x waybar && note "waybar reloaded"
     pgrep -x swaync >/dev/null && swaync-client -rs >/dev/null 2>&1 && note "swaync restyled"
     pgrep -x kitty >/dev/null && pkill -SIGUSR1 -x kitty && note "kitty reloaded"
-    pkill -x swaybg || true
-    setsid -f swaybg -m fill -i "$CURRENT/wallpaper.png" >/dev/null 2>&1 && note "wallpaper set"
-    if [[ "$walker_theme" != "$old_walker_theme" ]]; then
+    if ! has_session "$(active)"; then
+        pkill -x swaybg || true
+        setsid -f swaybg -m fill -i "$CURRENT/wallpaper.png" >/dev/null 2>&1 && note "wallpaper set"
+    fi
+    if [[ "$walker_theme" != "$old_walker_theme" || "${RICEFORGE_RESTART_WALKER:-0}" == 1 ]]; then
         # walker only scans themes at start; elephant must own a live socket first
         if [[ ! -S "${XDG_RUNTIME_DIR:-/run/user/$UID}/elephant/elephant.sock" ]]; then
             pkill -x elephant || true; setsid -f elephant >/dev/null 2>&1; sleep 1
@@ -151,6 +218,8 @@ cmd_apply() {
     d=$(theme_dir "$t")
     cmd_verify "$t"
     cmd_attach
+    migrate_autostart
+    local old_theme; old_theme=$(active)
     prev=$(readlink "$CURRENT" 2>/dev/null || true)
     old_wt=$(sed -n 's/^theme = "\([^"]*\)".*/\1/p' "$CFG/walker/config.toml")
     new_wt=$(. "$d/theme.env"; echo "$WALKER_THEME")
@@ -163,8 +232,19 @@ cmd_apply() {
     fi
     note "full hyprland config ok"
     sed -i "s/^theme = \"[^\"]*\"/theme = \"$new_wt\"/" "$CFG/walker/config.toml"
+    [[ "$old_theme" != none ]] && run_session "$old_theme" stop
     reload_all "$new_wt" "$old_wt"
+    run_session "$t" start
     say "active: $t"
+}
+
+cmd_session_start() {
+    local t; t=$(active)
+    if has_session "$t"; then
+        run_session "$t" start
+    else
+        . "$RF/bin/session-lib.sh"; applets_start; wallpaper_swaybg
+    fi
 }
 
 cmd_status() {
@@ -200,6 +280,9 @@ cmd_preview_bar() {
 cmd_detach() {
     say "detaching riceforge; restoring 'original' as plain files"
     local o="$THEMES/original"
+    local t; t=$(active)
+    [[ "$t" != none ]] && run_session "$t" stop
+    unmigrate_autostart
     for pair in "${LINKS[@]}"; do rm -f "$CFG/${pair%%:*}"; done
     cp -a "$o/waybar/config.jsonc" "$o/waybar/style.css" "$CFG/waybar/"
     cp -a "$o/hyprlock.conf" "$CFG/hypr/hyprlock.conf"
@@ -224,6 +307,7 @@ PY
     pkill -SIGUSR1 -x kitty || true
     pkill -x swaybg || true; setsid -f swaybg -i "$HOME/Pictures/Wallpapers/wallhaven-zpvqyj.png" >/dev/null 2>&1
     [[ "$old_wt" != "default" ]] && restart_walker
+    . "$RF/bin/session-lib.sh"; applets_start
     say "detached. themes stay in $THEMES; delete that folder to remove riceforge completely"
 }
 
@@ -234,8 +318,9 @@ case "${1:-status}" in
     apply)       cmd_apply "${2:-}" ;;
     revert)      cmd_apply original ;;
     preview-bar) cmd_preview_bar "${2:-}" "${3:-}" ;;
+    session-start) cmd_session_start ;;
     attach)      cmd_attach ;;
     detach)      cmd_detach ;;
-    -h|--help|help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//' ;;
+    -h|--help|help) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//' ;;
     *) die "unknown command '$1' (riceforge help)" ;;
 esac

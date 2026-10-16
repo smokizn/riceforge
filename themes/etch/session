@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# session for this theme: the classic setup (tray applets + swaybg wallpaper)
+. "$HOME/.config/riceforge/bin/session-lib.sh"
+case "$1" in
+    start) applets_start; wallpaper_swaybg ;;
+    stop)  applets_stop;  stop_all swaybg ;;
+esac
