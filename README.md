@@ -43,26 +43,26 @@ One-time edits made by `attach` (all undone by `detach`):
 
 ## NACRE (active)
 
-Liquid glass: smoked pearl, lavender and ice over a lit wallpaper.
+Liquid glass: charcoal and smoky grey, pale silver, dusty lavender and muted steel blue.
 
 | token    | hex       | used for                                      |
 |----------|-----------|-----------------------------------------------|
-| pearl    | `#eeecf8` | primary text, rims                            |
-| silver   | `#c4c7d6` | secondary text                                |
-| mist     | `#8b8fa6` | tertiary text, empty states                   |
-| lavender | `#b7a8ff` | focus: active workspace, selection, caret     |
-| ice      | `#9fd6f5` | charging, connected, the cool end of the rim  |
-| rose     | `#f3a6bc` | critical only                                 |
+| pearl    | `#d9d9e0` | primary text, rims (pale silver)              |
+| silver   | `#aeb0bc` | secondary text                                |
+| mist     | `#777a88` | tertiary text, empty states                   |
+| lavender | `#a39cc4` | focus: active workspace, selection, caret     |
+| ice      | `#8ea6bf` | charging, connected, the cool end of the rim  |
+| rose     | `#c4919d` | critical only                                 |
 
 Motion is real spring physics (Hyprland 0.56 `type = "spring"` curves):
 
 | spring | ζ    | overshoot | settle | used for                    |
 |--------|------|-----------|--------|-----------------------------|
-| jelly  | 0.56 | 12%       | 420ms  | windows opening             |
-| drop   | 0.60 | 9%        | 410ms  | scratchpads (discord/spotify)|
+| jelly  | 0.56 | 12%       | 570ms  | windows opening             |
+| drop   | 0.60 | 9%        | 550ms  | scratchpads (discord/spotify)|
 | pop    | 0.65 | 7%        | 310ms  | launcher, panels, menus     |
-| wobble | 0.68 | 5%        | 320ms  | tiling reflow, moving floats|
-| glide  | 0.74 | 3%        | 370ms  | workspace switches          |
+| wobble | 0.68 | 5%        | 440ms  | tiling reflow, moving floats|
+| glide  | 0.74 | 3%        | 500ms  | workspace switches          |
 
 Closing uses a bezier with negative y (a brief swell, then melt).
 Motion blur is off by default: set `MOTION_BLUR = true` in `themes/nacre/hypr.lua` to try it.

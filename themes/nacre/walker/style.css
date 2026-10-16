@@ -5,19 +5,19 @@
  * walker's own ext-background-effect request); everything else is CSS.
  */
 
-@define-color smoke    #1b1c28;
-@define-color pearl    #eeecf8;
-@define-color silver   #c4c7d6;
-@define-color mist     #8b8fa6;
-@define-color lavender #b7a8ff;
-@define-color ice      #9fd6f5;
-@define-color rose     #f3a6bc;
+@define-color smoke    #17181d;
+@define-color pearl    #d9d9e0;
+@define-color silver   #aeb0bc;
+@define-color mist     #777a88;
+@define-color lavender #a39cc4;
+@define-color ice      #8ea6bf;
+@define-color rose     #c4919d;
 
-@define-color window_bg_color #1b1c28;
-@define-color accent_bg_color #b7a8ff;
-@define-color theme_fg_color  #eeecf8;
-@define-color error_bg_color  #f3a6bc;
-@define-color error_fg_color  #1a1020;
+@define-color window_bg_color #17181d;
+@define-color accent_bg_color #a39cc4;
+@define-color theme_fg_color  #d9d9e0;
+@define-color error_bg_color  #c4919d;
+@define-color error_fg_color  #17131a;
 
 * {
   all: unset;
@@ -202,6 +202,6 @@ popover {
 .error {
   padding: 10px 14px;
   background-color: alpha(@rose, 0.85);
-  color: #1a1020;
+  color: #17131a;
   border-radius: 16px;
 }

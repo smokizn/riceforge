@@ -16,28 +16,28 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps
 
 WALLS = Path.home() / "Pictures/Wallpapers"
 
-TOP = (17, 17, 26)
-BOTTOM = (6, 6, 11)
-PEARL = (236, 234, 248)
+TOP = (16, 16, 20)
+BOTTOM = (6, 6, 8)
+PEARL = (206, 206, 214)
 
 # (cx, cy, radius) as fractions of width, then colour and strength.
-# few, saturated pools on deep smoke: glass needs contrast, not haze.
+# few, dusty pools on deep charcoal: enough colour for the glass to catch, never vivid.
 FIELDS = {
     "fenestra": [
-        ((0.16, 0.22, 0.24), (118, 92, 236), 0.78),    # lavender
-        ((0.86, 0.80, 0.26), (52, 160, 226), 0.70),    # ice
-        ((0.70, 0.06, 0.15), (232, 132, 190), 0.50),   # pearl rose
-        ((0.50, 0.50, 0.12), (150, 136, 250), 0.40),   # light behind the window
+        ((0.16, 0.22, 0.24), (92, 86, 132), 0.70),     # dusty lavender
+        ((0.86, 0.80, 0.26), (64, 92, 118), 0.66),     # steel blue
+        ((0.70, 0.06, 0.15), (118, 96, 112), 0.42),    # mauve
+        ((0.50, 0.50, 0.12), (110, 106, 140), 0.34),   # light behind the window
     ],
     "draco": [
-        ((0.80, 0.66, 0.24), (70, 140, 236), 0.72),
-        ((0.14, 0.20, 0.22), (128, 96, 230), 0.70),
-        ((0.40, 0.98, 0.16), (226, 134, 190), 0.45),
+        ((0.80, 0.66, 0.24), (66, 90, 120), 0.66),
+        ((0.14, 0.20, 0.22), (94, 86, 130), 0.64),
+        ((0.40, 0.98, 0.16), (116, 94, 110), 0.40),
     ],
     "trigonum": [
-        ((0.50, 0.28, 0.18), (132, 104, 240), 0.62),
-        ((0.12, 0.86, 0.24), (56, 156, 220), 0.66),
-        ((0.90, 0.84, 0.18), (228, 136, 192), 0.45),
+        ((0.50, 0.28, 0.18), (96, 88, 136), 0.58),
+        ((0.12, 0.86, 0.24), (62, 90, 116), 0.62),
+        ((0.90, 0.84, 0.18), (116, 94, 110), 0.40),
     ],
 }
 SOURCES = {
@@ -91,7 +91,7 @@ def build(name, out, w, h):
 
     # a soft bloom of light around the linework, as if lit from behind
     bloom = mask.filter(ImageFilter.GaussianBlur(40)).point(lambda v: min(255, v * 2))
-    field = Image.composite(Image.new("RGB", (w, h), (160, 146, 246)), field,
+    field = Image.composite(Image.new("RGB", (w, h), (128, 124, 160)), field,
                             bloom.point(lambda v: int(v * 0.22)))
     # the engraving itself in pearl
     field = Image.composite(Image.new("RGB", (w, h), PEARL), field, mask.point(lambda v: int(v * 0.92)))

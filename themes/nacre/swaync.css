@@ -6,18 +6,18 @@
 @import url("file:///etc/xdg/swaync/style.css");
 
 :root {
-  --cc-bg: rgba(44, 46, 66, 0.55);
+  --cc-bg: rgba(30, 31, 37, 0.55);
   --noti-border-color: rgba(255, 255, 255, 0.10);
-  --noti-bg: 50, 52, 74;
+  --noti-bg: 34, 35, 42;
   --noti-bg-alpha: 0.50;
   --noti-bg-darker: rgba(5, 5, 12, 0.26);
-  --noti-bg-hover: rgb(40, 41, 58);
-  --noti-bg-focus: rgba(183, 168, 255, 0.14);
+  --noti-bg-hover: rgb(36, 37, 44);
+  --noti-bg-focus: rgba(163, 156, 196, 0.14);
   --noti-close-bg: rgba(255, 255, 255, 0.10);
-  --noti-close-bg-hover: rgba(243, 166, 188, 0.55);
-  --text-color: rgb(238, 236, 248);
-  --text-color-disabled: rgb(139, 143, 166);
-  --bg-selected: rgb(183, 168, 255);
+  --noti-close-bg-hover: rgba(196, 145, 157, 0.55);
+  --text-color: rgb(217, 217, 224);
+  --text-color-disabled: rgb(119, 122, 136);
+  --bg-selected: rgb(163, 156, 196);
   --border-radius: 22px;
   --notification-icon-size: 46px;
   --notification-shadow: 0 12px 30px rgba(5, 5, 12, 0.26);
@@ -33,7 +33,7 @@
 .notification-row .notification-background .notification {
   background-image: linear-gradient(172deg,
       rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03) 40%,
-      rgba(255, 255, 255, 0.0) 60%, rgba(183, 168, 255, 0.05));
+      rgba(255, 255, 255, 0.0) 60%, rgba(163, 156, 196, 0.05));
   border: 1px solid rgba(255, 255, 255, 0.10);
   border-top-color: rgba(255, 255, 255, 0.28);
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.10), 0 12px 30px rgba(5, 5, 12, 0.26);
@@ -49,26 +49,26 @@
   opacity: 0.92;
 }
 .notification-row .notification-background .notification.normal {
-  border-bottom-color: rgba(159, 214, 245, 0.35);
+  border-bottom-color: rgba(142, 166, 191, 0.35);
 }
 .notification-group.critical .notification-row .notification-background .notification,
 .notification-row.critical .notification-background .notification,
 .notification-row .notification-background .notification.critical {
   background-image: linear-gradient(172deg,
-      rgba(243, 166, 188, 0.34), rgba(243, 166, 188, 0.10) 50%, rgba(255, 255, 255, 0.0));
-  border-color: rgba(243, 166, 188, 0.50);
-  border-top-color: rgba(255, 220, 230, 0.55);
+      rgba(196, 145, 157, 0.34), rgba(196, 145, 157, 0.10) 50%, rgba(255, 255, 255, 0.0));
+  border-color: rgba(196, 145, 157, 0.50);
+  border-top-color: rgba(226, 206, 212, 0.55);
 }
 
 .notification-row .notification-background .notification .notification-default-action .notification-content .text-box .summary {
   font-weight: 600;
-  color: rgb(244, 242, 252);
+  color: rgb(226, 226, 232);
 }
 .notification-row .notification-background .notification .notification-default-action .notification-content .text-box .body {
-  color: rgb(196, 199, 214);
+  color: rgb(174, 176, 188);
 }
 .notification-row .notification-background .notification .notification-default-action .notification-content .text-box .time {
-  color: rgb(139, 143, 166);
+  color: rgb(119, 122, 136);
 }
 
 .control-center {
@@ -92,9 +92,9 @@
   border-radius: 999px;
 }
 .widget-dnd switch:checked {
-  background: linear-gradient(90deg, rgb(201, 189, 255), rgb(159, 214, 245));
+  background: linear-gradient(90deg, rgb(176, 169, 204), rgb(142, 166, 191));
 }
 .widget-dnd switch slider {
   border-radius: 999px;
-  background: rgb(244, 242, 252);
+  background: rgb(226, 226, 232);
 }
