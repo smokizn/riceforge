@@ -31,7 +31,7 @@ LINKS=(
     "swaync/style.css:swaync.css"
 )
 
-c_red=$'\e[38;2;194;217;76m'; c_dim=$'\e[38;2;107;107;112m'; c_off=$'\e[0m'
+c_red=$'\e[38;2;183;168;255m'; c_dim=$'\e[38;2;139;143;166m'; c_off=$'\e[0m'
 say()  { printf '%s¶%s %s\n' "$c_red" "$c_off" "$*"; }
 note() { printf '  %s%s%s\n' "$c_dim" "$*" "$c_off"; }
 die()  { printf '%s¶ error:%s %s\n' "$c_red" "$c_off" "$*" >&2; exit 1; }

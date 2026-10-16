@@ -1,0 +1,100 @@
+/* NACRE · swaync
+ * swaync's own stylesheet provides structure; this re-skins it through its
+ * CSS variables and adds the glass recipe. Hyprland blurs behind both the
+ * popups and the control centre (layer rules in hypr.lua).
+ */
+@import url("file:///etc/xdg/swaync/style.css");
+
+:root {
+  --cc-bg: rgba(44, 46, 66, 0.55);
+  --noti-border-color: rgba(255, 255, 255, 0.10);
+  --noti-bg: 50, 52, 74;
+  --noti-bg-alpha: 0.50;
+  --noti-bg-darker: rgba(5, 5, 12, 0.26);
+  --noti-bg-hover: rgb(40, 41, 58);
+  --noti-bg-focus: rgba(183, 168, 255, 0.14);
+  --noti-close-bg: rgba(255, 255, 255, 0.10);
+  --noti-close-bg-hover: rgba(243, 166, 188, 0.55);
+  --text-color: rgb(238, 236, 248);
+  --text-color-disabled: rgb(139, 143, 166);
+  --bg-selected: rgb(183, 168, 255);
+  --border-radius: 22px;
+  --notification-icon-size: 46px;
+  --notification-shadow: 0 12px 30px rgba(5, 5, 12, 0.26);
+  --font-size-summary: 14px;
+  --font-size-body: 13px;
+}
+
+* {
+  font-family: "Adwaita Sans", "Inter", sans-serif;
+}
+
+/* each notice is a floating glass card with a lit top edge */
+.notification-row .notification-background .notification {
+  background-image: linear-gradient(172deg,
+      rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03) 40%,
+      rgba(255, 255, 255, 0.0) 60%, rgba(183, 168, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-top-color: rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.10), 0 12px 30px rgba(5, 5, 12, 0.26);
+}
+/* breathing room inside the glass */
+.notification-row .notification-background .notification .notification-default-action {
+  padding: 10px 14px;
+}
+
+/* urgency lives in the lower edge: quiet, normal, critical */
+.notification-row .notification-background .notification.low {
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+  opacity: 0.92;
+}
+.notification-row .notification-background .notification.normal {
+  border-bottom-color: rgba(159, 214, 245, 0.35);
+}
+.notification-group.critical .notification-row .notification-background .notification,
+.notification-row.critical .notification-background .notification,
+.notification-row .notification-background .notification.critical {
+  background-image: linear-gradient(172deg,
+      rgba(243, 166, 188, 0.34), rgba(243, 166, 188, 0.10) 50%, rgba(255, 255, 255, 0.0));
+  border-color: rgba(243, 166, 188, 0.50);
+  border-top-color: rgba(255, 220, 230, 0.55);
+}
+
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .summary {
+  font-weight: 600;
+  color: rgb(244, 242, 252);
+}
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .body {
+  color: rgb(196, 199, 214);
+}
+.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .time {
+  color: rgb(139, 143, 166);
+}
+
+.control-center {
+  background-image: linear-gradient(176deg,
+      rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02) 30%, rgba(255, 255, 255, 0.0) 70%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-top-color: rgba(255, 255, 255, 0.28);
+  border-radius: 28px;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.10), 0 20px 50px rgba(5, 5, 12, 0.26);
+}
+.widget-title > label {
+  font-family: "Mona Sans", "Adwaita Sans", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+}
+.widget-title > button {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.widget-dnd switch {
+  border-radius: 999px;
+}
+.widget-dnd switch:checked {
+  background: linear-gradient(90deg, rgb(201, 189, 255), rgb(159, 214, 245));
+}
+.widget-dnd switch slider {
+  border-radius: 999px;
+  background: rgb(244, 242, 252);
+}
