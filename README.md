@@ -12,7 +12,7 @@ hardware differences, and checks the result. Everything it replaces is backed up
 `riceforge uninstall` reverses it.
 
 ```bash
-git clone <REPOSITORY_URL> ~/riceforge
+git clone https://github.com/smokizn/riceforge.git ~/riceforge
 cd ~/riceforge
 ./setup
 ```
@@ -58,7 +58,7 @@ x86_64 only for the full stack. On other architectures the AUR `-bin` packages a
 ## Install
 
 ```bash
-git clone <REPOSITORY_URL> ~/riceforge   # any location works
+git clone https://github.com/smokizn/riceforge.git ~/riceforge   # any location works
 cd ~/riceforge
 ./setup --dry-run                         # optional: see the plan, change nothing
 ./setup
