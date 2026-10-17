@@ -1,0 +1,194 @@
+@define-color window_bg_color #161616;
+@define-color accent_bg_color #3d3d3d;
+@define-color theme_fg_color #e5e5e5;
+@define-color error_bg_color #C34043;
+@define-color error_fg_color #DCD7BA;
+
+* {
+  all: unset;
+}
+
+popover {
+  background: alpha(#1a1a1a, 0.95);
+  border: 1px solid alpha(#ffffff, 0.08);
+  border-radius: 20px;
+  padding: 10px;
+}
+
+.normal-icons {
+  -gtk-icon-size: 18px;
+}
+
+.large-icons {
+  -gtk-icon-size: 36px;
+}
+
+scrollbar {
+  opacity: 0;
+}
+
+.box-wrapper {
+  background: alpha(#111111, 0.92);
+  padding: 28px;
+  border-radius: 24px;
+
+  border: 1px solid alpha(#ffffff, 0.08);
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.45),
+    0 10px 20px rgba(0,0,0,0.25);
+}
+
+.preview-box,
+.elephant-hint,
+.placeholder {
+  color: @theme_fg_color;
+}
+
+.search-container {
+  border-radius: 14px;
+}
+
+.input placeholder {
+  opacity: 0.5;
+}
+
+.input selection {
+  background: alpha(#4a4a4a, 0.8);
+}
+
+.input {
+  caret-color: @theme_fg_color;
+
+  background: alpha(#1f1f1f, 0.95);
+
+  color: @theme_fg_color;
+
+  padding: 14px;
+
+  border-radius: 16px;
+
+  border: 1px solid alpha(#ffffff, 0.05);
+
+  font-size: 15px;
+}
+
+.list {
+  color: @theme_fg_color;
+}
+
+.item-box {
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.item-text {
+  font-size: 15px;
+}
+
+.item-subtext {
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+.providerlist .item-subtext {
+  font-size: unset;
+  opacity: 0.75;
+}
+
+.item-image-text {
+  font-size: 28px;
+}
+
+.item-quick-activation {
+  background: alpha(#4a4a4a, 0.25);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+child:selected .item-box,
+row:selected .item-box {
+  background: alpha(#4f4f4f, 0.35);
+}
+
+.preview {
+  border: 1px solid alpha(#ffffff, 0.08);
+  border-radius: 14px;
+  color: @theme_fg_color;
+}
+
+.calc .item-text {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.calc .item-subtext {
+  opacity: 0.6;
+}
+
+.symbols .item-image {
+  font-size: 24px;
+}
+
+.todo.done .item-text-box {
+  opacity: 0.25;
+}
+
+.todo.urgent {
+  font-size: 24px;
+}
+
+.todo.active {
+  font-weight: bold;
+}
+
+.bluetooth.disconnected {
+  opacity: 0.5;
+}
+
+.preview .large-icons {
+  -gtk-icon-size: 72px;
+}
+
+.keybinds {
+  padding-top: 12px;
+  border-top: 1px solid alpha(#ffffff, 0.08);
+
+  font-size: 12px;
+  color: @theme_fg_color;
+}
+
+.keybind-button {
+  opacity: 0.55;
+}
+
+.keybind-button:hover {
+  opacity: 0.85;
+}
+
+.keybind-bind {
+  text-transform: lowercase;
+  opacity: 0.4;
+}
+
+.keybind-label {
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid alpha(#ffffff, 0.20);
+}
+
+.error {
+  padding: 10px;
+  background: @error_bg_color;
+  color: @error_fg_color;
+  border-radius: 10px;
+}
+
+:not(.calc).current {
+  font-style: italic;
+}
+
+.preview-content.archlinuxpkgs,
+.preview-content.dnfpackages {
+  font-family: monospace;
+}

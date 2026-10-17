@@ -1,0 +1,7 @@
+[Desktop Entry]
+# Riceforge: tray applets are started and stopped by the active theme's session
+# (original/etch run them, nacre replaces them with riceforge-shell). This
+# per-user override hides the system autostart entry so they never run twice.
+Type=Application
+Name=nm-applet (managed by Riceforge)
+Hidden=true

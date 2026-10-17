@@ -10,8 +10,10 @@ wallpaper() {
         stop_all swaybg
         start_once awww-daemon awww-daemon
         for _ in $(seq 30); do awww query >/dev/null 2>&1 && break; sleep 0.1; done
-        awww img "$CURRENT/wallpaper.png" --transition-type fade --transition-duration 0.8 >/dev/null 2>&1 \
-            || wallpaper_swaybg
+        if ! awww img "$CURRENT/wallpaper.png" --transition-type fade --transition-duration 0.8 >/dev/null 2>&1; then
+            stop_all awww-daemon      # unreachable daemon: don't leave it beside swaybg
+            wallpaper_swaybg
+        fi
     else
         wallpaper_swaybg
     fi

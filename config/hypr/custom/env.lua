@@ -1,0 +1,2 @@
+-- Your own Hyprland env. Riceforge never overwrites files in custom/.
+-- See ~/.config/hypr/hyprlua/env.lua for the defaults this layer extends.

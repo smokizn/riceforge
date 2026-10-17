@@ -1,0 +1,165 @@
+#!/usr/bin/env bash
+# Riceforge setup: turn an installed Arch Linux into the Riceforge Hyprland desktop.
+#
+#   ./setup                     guided install (asks before every system change)
+#   ./setup --dry-run           show the plan and every command, change nothing
+#   ./setup --yes               accept defaults, no questions (CI / re-runs)
+#
+# Options:
+#   --profile NAME              desktop | laptop | acer-nitro (default: detected)
+#   --features LIST             e.g. "+personal,-aesthetic" or "core,launcher,shell"
+#   --theme NAME                nacre (default) | etch | original
+#   --keep-theme                on re-runs keep whatever theme is active
+#   --kb-layout X               keyboard layout for Hyprland (default: from localectl)
+#   --aur-helper H              paru | yay | none (never assumed; detected or asked)
+#   --no-packages               skip pacman/AUR
+#   --no-system                 skip system services and login setup
+#   --uninstall [opts]          same as: riceforge uninstall [opts]
+#
+# Safe to run repeatedly: nothing is duplicated, existing files are backed up to
+# ~/.local/state/riceforge/backups/<time>/ before they are replaced.
+set -euo pipefail
+RF_SRC="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd -P)"
+export RF_SRC
+. "$RF_SRC/install/lib.sh"
+. "$RF_SRC/install/preflight.sh"
+. "$RF_SRC/install/dependencies.sh"
+. "$RF_SRC/install/system.sh"
+. "$RF_SRC/install/user-config.sh"
+
+OPT_PROFILE="" OPT_FEATURES="" OPT_THEME="" KEEP_THEME=0 OPT_KB="" NO_PKGS=0 NO_SYSTEM=0 OPT_AUR=""
+while (( $# )); do
+    case "$1" in
+        --dry-run|-n) DRY_RUN=1 ;;
+        --yes|-y) ASSUME_YES=1 ;;
+        --profile) OPT_PROFILE="${2:?}"; shift ;;
+        --features) OPT_FEATURES="${2:?}"; shift ;;
+        --theme) OPT_THEME="${2:?}"; shift ;;
+        --keep-theme) KEEP_THEME=1 ;;
+        --kb-layout) OPT_KB="${2:?}"; shift ;;
+        --aur-helper) OPT_AUR="${2:?}"; shift ;;
+        --no-packages) NO_PKGS=1 ;;
+        --no-system) NO_SYSTEM=1 ;;
+        --uninstall) shift; exec "$RF_SRC/install/uninstall.sh" "$@" ;;
+        -h|--help) sed -n '2,22p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        *) die "unknown option '$1' (./setup --help)" ;;
+    esac
+    shift
+done
+export DRY_RUN ASSUME_YES
+set -E
+trap 'printf "%s✗ setup failed at line %s: %s%s\n" "$c_bad" "$LINENO" "$BASH_COMMAND" "$c_off" >&2; [[ -n "$RF_LOG" ]] && echo "  log: $RF_LOG" >&2' ERR
+
+printf '\n%s  RICEFORGE%s  ·  visionary hyprland desktop\n\n' "$c_acc" "$c_off"
+start_log setup
+preflight
+
+# ── choices ────────────────────────────────────────────────────────────────────
+load_machine                                     # previous answers, if any
+default_features() { awk -F'\t' '!/^#/ && $2=="on" {printf "%s ", $1}' "$RF_SRC/manifests/features.tsv"; }
+
+say "choices"
+PROFILE="${OPT_PROFILE:-${PROFILE:-$(detect_profile)}}"
+if [[ -z "$OPT_PROFILE" && "$ASSUME_YES" != 1 ]]; then
+    note "profiles: $(cd "$RF_SRC/profiles" && ls *.conf | sed 's/\.conf$//' | tr '\n' ' ')"
+    PROFILE=$(ask "hardware profile?" "$PROFILE")
+fi
+[[ -f "$RF_SRC/profiles/$PROFILE.conf" ]] || die "unknown profile '$PROFILE' (see profiles/)"
+DESCRIPTION="" FEATURES_ADD="" FEATURES_REMOVE="" PROFILE_EXTRAS=""
+# shellcheck disable=SC1090
+PROFILE_EXTRAS=$(. "$RF_SRC/profiles/$PROFILE.conf"; echo "$HYPR_EXTRAS")
+. "$RF_SRC/profiles/$PROFILE.conf"
+ok "profile: $PROFILE — $DESCRIPTION"
+
+base_features="${FEATURES:-$(default_features)}"
+base_features="$base_features $FEATURES_ADD"
+for f in $FEATURES_REMOVE; do base_features=" $base_features "; base_features="${base_features// $f / }"; done
+FEATURES=$(apply_feature_spec "${OPT_FEATURES:-+}" "$base_features")
+[[ -z "$PF_DM" && "$NO_SYSTEM" != 1 && " $FEATURES " != *" display-manager "* && -z "$OPT_FEATURES" && "$ASSUME_YES" != 1 ]] \
+    && confirm "no display manager is enabled; install SDDM for graphical login?" n && FEATURES+=" display-manager"
+if [[ -z "$OPT_FEATURES" && "$ASSUME_YES" != 1 ]]; then
+    note "features available:"
+    while IFS=$'\t' read -r f d desc; do
+        [[ "$f" == \#* ]] && continue
+        printf '    %s %-16s %s\n' "$([[ " $FEATURES " == *" $f "* ]] && echo '●' || echo '○')" "$f" "$desc"
+    done < "$RF_SRC/manifests/features.tsv"
+    spec=$(ask "adjust (e.g. +personal,-aesthetic) or Enter to accept" "")
+    [[ -n "$spec" ]] && FEATURES=$(apply_feature_spec "$spec" "$FEATURES")
+fi
+ok "features: $FEATURES"
+
+HYPR_EXTRAS="$PROFILE_EXTRAS"
+feature_on personal && HYPR_EXTRAS+=" personal"
+if [[ "$PF_GPUS" == nvidia ]]; then
+    confirm "NVIDIA is the only GPU: add the NVIDIA Hyprland environment variables? (drivers are not touched)" \
+        && HYPR_EXTRAS+=" nvidia"
+fi
+HYPR_EXTRAS="${HYPR_EXTRAS# }"
+[[ "$PF_GPUS" == *nvidia* ]] && ! pacman -Qq nvidia-utils >/dev/null 2>&1 \
+    && warn "an NVIDIA GPU is present without nvidia-utils; install a driver yourself (Riceforge never changes GPU drivers)"
+
+[[ -z "$OPT_KB$KB_LAYOUT" ]] && KB_LAYOUT=$(localectl status 2>/dev/null | awk -F': *' '/X11 Layout/ {print $2}' || true)
+KB_LAYOUT="${OPT_KB:-$KB_LAYOUT}"
+KB_LAYOUT="${KB_LAYOUT:-us}"
+ok "keyboard layout: $KB_LAYOUT"
+[[ -n "$OPT_AUR" ]] && AUR_HELPER="$OPT_AUR"
+
+if [[ -n "$OPT_THEME" ]]; then THEME="$OPT_THEME"
+elif [[ -L "$RF_SRC/current" && ( "$KEEP_THEME" == 1 || "$PF_EXISTING" == 1 ) ]]; then THEME=$(basename "$(readlink "$RF_SRC/current")")
+else THEME=nacre; fi
+[[ -d "$RF_SRC/themes/$THEME" ]] || die "no theme '$THEME'"
+ok "theme: $THEME"
+
+# ── plan ───────────────────────────────────────────────────────────────────────
+say "plan"
+missing_repo=0; missing_aur=0
+while read -r p; do satisfied "$p" || missing_repo=$((missing_repo+1)); done < <(packages_for repo)
+while read -r p; do satisfied "$p" || missing_aur=$((missing_aur+1)); done < <(packages_for aur)
+if [[ "$NO_PKGS" == 1 ]]; then note "packages: skipped (--no-packages)"
+else note "packages: $missing_repo official and $missing_aur AUR to install (already-installed ones are left alone)"; fi
+[[ "$NO_SYSTEM" == 1 ]] && note "system: skipped (--no-system)" \
+    || note "system: enable NetworkManager/bluetooth if needed$(feature_on display-manager && echo ', SDDM'); nothing else system-wide"
+to_backup=()
+while IFS=$'\t' read -r mode src dst; do
+    t="$HOME/$dst"
+    [[ "$mode" == link && ( -e "$t" || -L "$t" ) ]] || continue
+    [[ -L "$t" && "$(readlink "$t")" == */.config/riceforge/* ]] && continue
+    to_backup+=("~/$dst")
+done < <(manifest_rows deploy.tsv)
+note "files: $(manifest_rows deploy.tsv | wc -l) links/seeds into ~/.config; ${#to_backup[@]} existing file(s) will be backed up first"
+for b in "${to_backup[@]}"; do note "    backup: $b"; done
+note "machine layer: ~/.config/riceforge-local (profile, features, keyboard, location)"
+note "never touched: disks, bootloader, kernel, GPU drivers, network credentials"
+[[ "$DRY_RUN" == 1 ]] && note "dry run: commands are printed, nothing changes"
+confirm "proceed?" || die "nothing changed"
+
+# ── run ────────────────────────────────────────────────────────────────────────
+[[ "$DRY_RUN" == 1 ]] || trap 'printf "%s✗ setup failed at line %s: %s%s\n" "$c_bad" "$LINENO" "$BASH_COMMAND" "$c_off" >&2
+      warn "setup stopped part-way. Replaced files are in $RF_BACKUP; re-run ./setup to finish, or: riceforge uninstall"' ERR
+[[ "$NO_PKGS" == 1 ]] || install_dependencies
+[[ "$NO_SYSTEM" == 1 ]] || configure_system
+configure_user_session
+deploy_user_config
+say "theme"
+if [[ "$DRY_RUN" == 1 ]]; then note "would apply theme $THEME"
+else
+    RICEFORGE_NO_LIVE=$([[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && echo 0 || echo 1) \
+        "$RF_SRC/bin/riceforge" apply "$THEME" || warn "theme '$THEME' did not apply cleanly; see riceforge verify $THEME"
+fi
+trap - ERR
+set +E
+state_put setup last "$RF_STAMP" "$PROFILE"
+
+say "done"
+if [[ "$DRY_RUN" != 1 ]]; then
+    "$RF_SRC/install/validation.sh" || true
+    echo
+    note "log: $RF_LOG"
+    [[ -d "$RF_BACKUP" ]] && note "backups of replaced files: $RF_BACKUP"
+fi
+if [[ -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+    note "next: $([[ -n "$PF_DM" ]] || feature_on display-manager && echo 'reboot and choose Hyprland at the login screen' || echo 'log in on a console and run: uwsm start hyprland.desktop')"
+else
+    note "most changes are live; log out and back in once so autostart picks up the new session"
+fi
+note "add ~/.local/bin to PATH to use 'riceforge' directly (fish does this by default)"

@@ -200,7 +200,7 @@ class MoonPanel(Panel):
             self.grid.attach(label(k, "rf-row-sub"), 0, i, 1, 1)
             self.grid.attach(label(v, "rf-row-title"), 1, i, 1, 1)
         self.note.set_text(f"Sun times for {self.cfg['place']} ({self.cfg['lat']:.2f}, {self.cfg['lon']:.2f}); "
-                           "set your location in ~/.config/riceforge/shell/config.toml.")
+                           "set your location in ~/.config/riceforge-local/shell.toml.")
         self.area.queue_draw()
 
 

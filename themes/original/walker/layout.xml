@@ -16,8 +16,8 @@
         <property name="orientation">horizontal</property>
         <property name="valign">center</property>
         <property name="halign">center</property>
-        <property name="width-request">660</property>
-        <property name="height-request">520</property>
+        <property name="width-request">600</property>
+        <property name="height-request">570</property>
         <child>
           <object class="GtkBox" id="Box">
             <style>
@@ -27,52 +27,6 @@
             <property name="hexpand-set">true</property>
             <property name="hexpand">true</property>
             <property name="spacing">10</property>
-            <child>
-              <object class="GtkBox" id="VisionaryHeader">
-                <style>
-                  <class name="v-header"></class>
-                </style>
-                <property name="orientation">horizontal</property>
-                <property name="spacing">10</property>
-                <child>
-                  <object class="GtkImage">
-                    <property name="file">/home/smoke/.config/riceforge/current/icons/brass/sun.svg</property>
-                    <property name="pixel-size">18</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <style>
-                      <class name="v-title"></class>
-                    </style>
-                    <property name="label">INVOCATIO</property>
-                    <property name="xalign">0</property>
-                    <property name="hexpand">true</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <style>
-                      <class name="v-hint"></class>
-                    </style>
-                    <property name="label">;  providers   /  files   =  calc   :  clipboard</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkImage">
-                    <property name="file">/home/smoke/.config/riceforge/current/icons/silver/moon-2.svg</property>
-                    <property name="pixel-size">16</property>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkBox">
-                <style>
-                  <class name="v-rule"></class>
-                </style>
-              </object>
-            </child>
             <child>
               <object class="GtkBox" id="SearchContainer">
                 <style>
@@ -134,8 +88,8 @@
                     <property name="overlay-scrolling">true</property>
                     <property name="hexpand">true</property>
                     <property name="vexpand">true</property>
-                    <property name="max-content-width">620</property>
-                    <property name="min-content-width">620</property>
+                    <property name="max-content-width">500</property>
+                    <property name="min-content-width">500</property>
                     <property name="max-content-height">400</property>
                     <property name="propagate-natural-height">true</property>
                     <property name="propagate-natural-width">true</property>

@@ -1,0 +1,103 @@
+# Riceforge dependency manifest (source of truth; read by install/dependencies.sh,
+# install/validation.sh and tests/test_manifest.sh).
+#
+# Columns are TAB separated:
+#   package   source   feature   tier   commands   purpose   alternatives
+# source:  repo = official Arch repositories (pacman), aur = AUR (needs a helper you choose)
+# feature: which install feature pulls it in (see manifests/features.tsv)
+# tier:    1 required for a working desktop   2 a Riceforge feature   3 optional aesthetic
+#          4 hardware-specific                5 development / maintenance
+# commands: executables the configs call (comma list, "-" for none); validation checks them
+#
+# ── tier 1: compositor, session, bar, terminal ──────────────────────────────────────────
+hyprland	repo	core	1	Hyprland,hyprctl,start-hyprland	compositor; Lua config (0.56+ required)	-
+hyprlock	repo	core	1	hyprlock	lock screen (SUPER+L, idle)	-
+hypridle	repo	core	1	hypridle	idle: lock after 5 min, screen off after 10	-
+hyprpolkitagent	repo	core	1	-	polkit authentication dialogs	polkit-gnome
+xdg-desktop-portal-hyprland	repo	core	1	-	screen sharing, screenshots portal	-
+xdg-desktop-portal-gtk	repo	core	1	-	file chooser portal	xdg-desktop-portal-kde
+qt6-wayland	repo	core	1	-	Qt apps on Wayland (QT_QPA_PLATFORM=wayland)	-
+qt6ct	repo	core	1	-	Qt theming (QT_QPA_PLATFORMTHEME=qt6ct)	-
+uwsm	repo	core	1	uwsm	systemd session wrapper used by the hyprland-uwsm login entry	start-hyprland
+waybar	repo	core	1	waybar	top bar (themed per Riceforge theme)	-
+swaync	repo	core	1	swaync,swaync-client	notification daemon + centre	mako, dunst
+kitty	repo	core	1	kitty	terminal	foot
+fish	repo	core	1	fish	interactive shell (kitty runs fish --login)	-
+swaybg	repo	core	1	swaybg	wallpaper fallback (always available)	awww
+wl-clipboard	repo	core	1	wl-copy,wl-paste	clipboard for screenshots and pickers	-
+grim	repo	core	1	grim	screenshots	-
+slurp	repo	core	1	slurp	region selection for screenshots	-
+brightnessctl	repo	core	1	brightnessctl	brightness keys and bar scroll	light
+playerctl	repo	core	1	playerctl	media keys; Playerctl typelib for the bar's now-playing	-
+pipewire	repo	core	1	-	audio server	-
+pipewire-pulse	repo	core	1	-	PulseAudio compatibility (pactl, pavucontrol)	-
+wireplumber	repo	core	1	wpctl	session manager; volume keys use wpctl	-
+libpulse	repo	core	1	pactl	mic toggle script and bar mute	-
+pavucontrol	repo	core	1	pavucontrol	volume mixer (bar click, CTRL+SUPER+V)	pavucontrol-qt
+libnotify	repo	core	1	notify-send	notifications from scripts	-
+xdg-user-dirs	repo	core	1	xdg-user-dirs-update	~/Pictures etc. for screenshots and wallpapers	-
+xdg-utils	repo	core	1	xdg-open	opening links and files	-
+procps-ng	repo	core	1	pgrep,pkill	session helpers	-
+util-linux	repo	core	1	setsid	session helpers	-
+python	repo	core	1	python3	waybar scripts, theme verification	-
+python-gobject	repo	core	1	-	GTK/GLib bindings for scripts and riceforge-shell	-
+gtk3	repo	core	1	-	waybar CSS verification	-
+gtk4	repo	core	1	-	riceforge-shell, swaync/walker CSS verification	-
+librsvg	repo	core	1	rsvg-convert	SVG icons (bar, shell) and icon verification	-
+git	repo	core	1	git	updates (riceforge update)	-
+# ── tier 1: fonts the themes name ──────────────────────────────────────────────────────
+ttf-iosevka-nerd	repo	core	1	-	terminal + bar font (Iosevka Nerd Font)	ttf-iosevkaterm-nerd
+ttf-nerd-fonts-symbols	repo	core	1	-	nerd glyphs used by the original/etch bars	-
+noto-fonts	repo	core	1	-	Noto Serif (display fallback) and UI fallback	-
+noto-fonts-emoji	repo	core	1	-	emoji (bar gun widget, hypremoji)	-
+adwaita-fonts	repo	core	1	-	Adwaita Sans (nacre UI text)	-
+# ── tier 2: what the original and etch themes run instead of riceforge-shell ─────────────
+network-manager-applet	repo	core	2	nm-applet	tray Wi-Fi applet (original/etch session)	-
+blueman	repo	core	2	blueman-applet,blueman-manager	tray Bluetooth applet + manager (original/etch)	blueman-git (AUR)
+fortune-mod	repo	core	3	fortune	quote on the original theme's lock screen	-
+# ── tier 1 via AUR: launcher ───────────────────────────────────────────────────────────
+walker-bin	aur	launcher	1	walker	launcher (SUPER); nacre/etch manuscript themes	walker
+elephant	aur	launcher	1	elephant	walker's data provider service (desktop apps built in)	-
+# ── tier 2: riceforge-shell (Wi-Fi/Bluetooth panels, desk, plate archive) ───────────────
+networkmanager	repo	shell	2	nmcli	Wi-Fi backend for the Wi-Fi panel and bar	-
+libnm	repo	shell	2	-	NM-1.0 typelib used by the Wi-Fi panel	-
+nm-connection-editor	repo	shell	2	nm-connection-editor	802.1X/advanced networks (bar right-click)	-
+bluez	repo	shell	2	-	Bluetooth daemon; the panel is a BlueZ D-Bus client + pairing agent	-
+bluez-utils	repo	shell	2	bluetoothctl	diagnostics (riceforge doctor)	-
+upower	repo	shell	2	upower	battery on the desk strip	-
+gtk4-layer-shell	repo	shell	2	-	layer-shell panels (preloaded by shell/riceforge-shell)	-
+python-cairo	repo	shell	2	-	astrolabe, moon and lock-screen art	-
+pango	repo	shell	2	-	PangoCairo text on the desk widgets	-
+gdk-pixbuf2	repo	shell	2	-	plate archive thumbnails	-
+# ── tier 2: walker providers (prefix in walker; nacre header lists them) ────────────────
+elephant-providerlist	aur	launcher-extras	2	-	walker ';' provider list	-
+elephant-runner	aur	launcher-extras	2	-	walker '>' run command	-
+elephant-files	aur	launcher-extras	2	-	walker '/' files (needs fd)	-
+elephant-symbols	aur	launcher-extras	2	-	walker '.' symbols	-
+elephant-unicode	aur	launcher-extras	2	-	unicode glyph search	-
+elephant-calc	aur	launcher-extras	2	-	walker '=' calculator (libqalculate)	-
+elephant-clipboard	aur	launcher-extras	2	-	walker ':' clipboard history (SUPER+V)	cliphist
+elephant-websearch	aur	launcher-extras	2	-	walker '@' web search	-
+elephant-todo	aur	launcher-extras	2	-	walker '!' todo	-
+elephant-bookmarks	aur	launcher-extras	2	-	walker '%' bookmarks	-
+elephant-windows	aur	launcher-extras	2	-	walker '$' window switcher	-
+# ── tier 2: apps and utilities the keybinds call ──────────────────────────────────────
+hyprpicker	repo	apps	2	hyprpicker	colour picker (SUPER+SHIFT+C)	-
+btop	repo	apps	2	btop	task manager (CTRL+SHIFT+Esc)	-
+dolphin	repo	apps	2	dolphin	file manager (SUPER+E; first available is used)	nautilus, thunar
+hypremoji	aur	apps	2	hypremoji	emoji picker (SUPER+.)	-
+wlogout	aur	apps	2	wlogout	session menu (CTRL+ALT+Del, original bar)	-
+mpv	repo	apps	2	mpv	sound for the bar's gun toy (silent without it)	-
+# ── tier 3: optional aesthetics ────────────────────────────────────────────────────────
+otf-cormorant	repo	aesthetic	3	-	Cormorant / Cormorant SC display serif (nacre); falls back to Noto Serif	ttf-cormorant
+awww	repo	aesthetic	3	awww,awww-daemon	wallpaper crossfades (nacre); swaybg is the fallback	swaybg
+# ── personal apps the original autostart ran (off unless selected) ────────────────────
+discord	repo	personal	2	discord	autostart + special:discord workspace	discord-ptb (AUR)
+easyeffects	repo	personal	2	easyeffects	audio effects, autostarted when installed	-
+zen-browser-bin	aur	personal	2	zen-browser	browser (SUPER+W tries zen, firefox, chromium...)	firefox
+# ── tier 4: hardware-specific (installed only when the profile asks) ───────────────────
+sddm	repo	display-manager	4	-	graphical login, only if no display manager is enabled	greetd, ly
+# ── tier 5: development and maintenance ───────────────────────────────────────────────
+python-pillow	repo	dev	5	-	plate/icon generators in themes/*/tools	-
+python-numpy	repo	dev	5	-	plate engraving generator	-
+lua	repo	dev	5	luac	Lua syntax checks in tests	-

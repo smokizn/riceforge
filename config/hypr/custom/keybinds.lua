@@ -1,0 +1,2 @@
+-- Your own Hyprland keybinds. Riceforge never overwrites files in custom/.
+-- See ~/.config/hypr/hyprlua/keybinds.lua for the defaults this layer extends.

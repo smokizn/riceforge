@@ -1,10 +1,13 @@
-# riceforge-shell settings (read at start; `riceforge-shell quit` then reopen to apply)
+# riceforge-shell defaults (tracked). Don't edit this for one machine:
+# put overrides in ~/.config/riceforge-local/shell.toml (same keys), which
+# ./setup writes from your timezone. `riceforge-shell quit`, then
+# `riceforge session-start` to apply.
 
 [location]
-# used for sunrise/sunset on the astrolabe; the default comes from your timezone (Asia/Kolkata)
-place = "New Delhi (timezone default)"
-lat = 28.61
-lon = 77.21
+# sunrise/sunset on the astrolabe
+place = "Greenwich (default)"
+lat = 51.48
+lon = 0.0
 
 [widgets]
 astrolabe = true

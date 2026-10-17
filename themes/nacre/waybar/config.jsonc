@@ -149,6 +149,7 @@
 
     "custom/fan_monitor": {
         "exec": "~/.config/hypr/hyprland/scripts/fan_monitor.sh",
+        "exec-if": "test -d /sys/module/linuwu_sense",
         "return-type": "json",
         "interval": 3,
         "tooltip": true
@@ -156,6 +157,9 @@
 
     "custom/fan": {
         "format": " ",
+        "exec": "echo fan",
+        "exec-if": "test -x /usr/local/bin/fan-toggle",
+        "interval": "once",
         "on-click": "python3 ~/.config/hypr/hyprland/scripts/fan_toggle.py",
         "tooltip-format": "Toggle fan: auto / max"
     },

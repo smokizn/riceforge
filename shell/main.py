@@ -29,29 +29,37 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Gdk", "4.0")
 from gi.repository import Gdk, Gio, GLib, Gtk  # noqa: E402
 
-DEFAULTS = {"lat": 28.61, "lon": 77.21, "place": "New Delhi (timezone default)",
+DEFAULTS = {"lat": 51.48, "lon": 0.0, "place": "Greenwich (default)",
             "astrolabe": True, "strip": True, "margin_bottom": 76, "margin_right": 64}
+# tracked defaults, then the machine's own file (written by ./setup, never tracked)
+CONFIG_FILES = (HERE / "config.toml", Path.home() / ".config/riceforge-local/shell.toml")
 
 
-def load_config():
+def merge_config(cfg, data):
+    loc, wid = data.get("location", {}), data.get("widgets", {})
+    if isinstance(loc.get("lat"), (int, float)) and -90 <= loc["lat"] <= 90:
+        cfg["lat"] = float(loc["lat"])
+    if isinstance(loc.get("lon"), (int, float)) and -180 <= loc["lon"] <= 180:
+        cfg["lon"] = float(loc["lon"])
+    if isinstance(loc.get("place"), str):
+        cfg["place"] = loc["place"][:60]
+    for k in ("astrolabe", "strip"):
+        if isinstance(wid.get(k), bool):
+            cfg[k] = wid[k]
+    for k in ("margin_bottom", "margin_right"):
+        if isinstance(wid.get(k), int) and 0 <= wid[k] <= 2000:
+            cfg[k] = wid[k]
+
+
+def load_config(files=CONFIG_FILES):
     cfg = dict(DEFAULTS)
-    p = HERE / "config.toml"
-    try:
-        data = tomllib.loads(p.read_text())
-        loc, wid = data.get("location", {}), data.get("widgets", {})
-        for k in ("lat", "lon"):
-            if isinstance(loc.get(k), (int, float)) and -180 <= loc[k] <= 180:
-                cfg[k] = float(loc[k])
-        if isinstance(loc.get("place"), str):
-            cfg["place"] = loc["place"][:60]
-        for k in ("astrolabe", "strip"):
-            if isinstance(wid.get(k), bool):
-                cfg[k] = wid[k]
-        for k in ("margin_bottom", "margin_right"):
-            if isinstance(wid.get(k), int) and 0 <= wid[k] <= 2000:
-                cfg[k] = wid[k]
-    except (OSError, tomllib.TOMLDecodeError) as e:
-        print(f"config: using defaults ({e})", file=sys.stderr)
+    for p in files:
+        if not p.exists():
+            continue
+        try:
+            merge_config(cfg, tomllib.loads(p.read_text()))
+        except (OSError, tomllib.TOMLDecodeError) as e:
+            print(f"config: ignoring {p} ({e})", file=sys.stderr)
     return cfg
 
 

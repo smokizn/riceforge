@@ -1,0 +1,42 @@
+# Files Riceforge places in your home directory. Read by install/user-config.sh,
+# install/uninstall.sh, install/validation.sh and the tests.
+#
+# mode   source (relative to the repo)   target (relative to $HOME)    TAB separated
+#   link  target becomes a symlink to ~/.config/riceforge/<source>; anything already
+#         there is moved into the install backup first
+#   seed  copied only when the target does not exist; yours to edit afterwards
+#
+# Targets through `current` follow the active theme (current -> themes/<name>).
+
+# ── base desktop ───────────────────────────────────────────────────────────────
+link	config/hypr/hyprland.lua	.config/hypr/hyprland.lua
+link	config/hypr/hyprlua	.config/hypr/hyprlua
+link	config/hypr/hypridle.conf	.config/hypr/hypridle.conf
+link	config/hypr/hyprland/scripts/launch_first_available.sh	.config/hypr/hyprland/scripts/launch_first_available.sh
+link	config/hypr/hyprland/scripts/fan_monitor.sh	.config/hypr/hyprland/scripts/fan_monitor.sh
+link	config/hypr/hyprland/scripts/fan_toggle.py	.config/hypr/hyprland/scripts/fan_toggle.py
+link	config/hypr/hyprland/scripts/damx_toggle.py	.config/hypr/hyprland/scripts/damx_toggle.py
+seed	config/hypr/custom/env.lua	.config/hypr/custom/env.lua
+seed	config/hypr/custom/execs.lua	.config/hypr/custom/execs.lua
+seed	config/hypr/custom/general.lua	.config/hypr/custom/general.lua
+seed	config/hypr/custom/keybinds.lua	.config/hypr/custom/keybinds.lua
+seed	config/hypr/custom/rules.lua	.config/hypr/custom/rules.lua
+link	config/waybar/scripts/mediaplayer.py	.config/waybar/scripts/mediaplayer.py
+link	config/waybar/scripts/mic_toggle.sh	.config/waybar/scripts/mic_toggle.sh
+link	config/waybar/scripts/mic_toggle_click.sh	.config/waybar/scripts/mic_toggle_click.sh
+link	config/waybar/scripts/gun.sh	.config/waybar/scripts/gun.sh
+link	config/kitty/kitty.conf	.config/kitty/kitty.conf
+link	config/fish/conf.d/riceforge.fish	.config/fish/conf.d/riceforge.fish
+link	config/walker/config.toml	.config/walker/config.toml
+link	bin/riceforge	.local/bin/riceforge
+link	config/autostart/nm-applet.desktop	.config/autostart/nm-applet.desktop
+link	config/autostart/blueman.desktop	.config/autostart/blueman.desktop
+
+# ── theme layer (follows `riceforge apply <theme>`) ────────────────────────────
+link	current/hypr.lua	.config/hypr/riceforge.lua
+link	current/hyprlock.conf	.config/hypr/hyprlock.conf
+link	current/waybar/config.jsonc	.config/waybar/config.jsonc
+link	current/waybar/style.css	.config/waybar/style.css
+link	current/kitty.conf	.config/kitty/riceforge-theme.conf
+link	current/swaync.css	.config/swaync/style.css
+link	current/walker	.config/walker/themes/riceforge

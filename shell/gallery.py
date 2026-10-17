@@ -132,6 +132,8 @@ class GalleryPanel(Panel):
         try:
             for p in json.loads(idx.read_text()):
                 f = CURRENT / "wallpapers" / p["file"]
+                if p.get("local") and not f.exists():
+                    continue          # machine-local plate (not distributed); absent here
                 t = CURRENT / "wallpapers" / "thumbs" / (Path(p["file"]).stem + ".jpg")
                 plates.append({**p, "path": f, "thumb": t, "ok": f.exists() and self.backend.loadable(f),
                                "group": "Plates"})

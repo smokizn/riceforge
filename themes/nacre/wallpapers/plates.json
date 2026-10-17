@@ -162,7 +162,9 @@
     ],
     "origin": "re-print of user wallpaper",
     "attribution": null,
-    "order": 9
+    "order": 9,
+    "local": true,
+    "licence_note": "derived from a wallhaven download of unverified licence; kept on the author's machine only"
   },
   {
     "id": "draco",
@@ -177,7 +179,9 @@
     ],
     "origin": "re-print of user wallpaper",
     "attribution": null,
-    "order": 10
+    "order": 10,
+    "local": true,
+    "licence_note": "derived from a wallhaven download of unverified licence; kept on the author's machine only"
   },
   {
     "id": "trigonum",
@@ -192,6 +196,8 @@
     ],
     "origin": "re-print of user wallpaper",
     "attribution": null,
-    "order": 11
+    "order": 11,
+    "local": true,
+    "licence_note": "derived from a wallhaven download of unverified licence; kept on the author's machine only"
   }
 ]

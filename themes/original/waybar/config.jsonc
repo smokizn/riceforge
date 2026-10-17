@@ -48,7 +48,10 @@
     
     "custom/fan": {
     "format": "󰈐",
-    "on-click": "python3 ~/.config/hypr/hyprland/scripts/fan_toggle.py",
+    "exec": "echo fan",
+        "exec-if": "test -x /usr/local/bin/fan-toggle",
+        "interval": "once",
+        "on-click": "python3 ~/.config/hypr/hyprland/scripts/fan_toggle.py",
     "tooltip-format": "Left click to toggle Auto/Max fan speed"
 },
 
@@ -73,6 +76,7 @@
 
      "custom/fan_monitor": {
     "exec": "~/.config/hypr/hyprland/scripts/fan_monitor.sh",
+        "exec-if": "test -d /sys/module/linuwu_sense",
     "return-type": "json",
     "interval": 1,
     "tooltip": true
@@ -146,7 +150,7 @@
         "format-wifi": "",
         "format-ethernet": "  Wired",
         "format-disconnected": "  Offline",
-        "on-click": "bash ~/.config/waybar/scripts/rofi-wifi-menu.sh",
+        "on-click": "nm-connection-editor",
         "on-click-right": "nm-connection-editor" 
     },
 
@@ -154,7 +158,7 @@
         "format": "",
         "format-connected": "",
         "tooltip-format": "{device_alias}",
-        "on-click": "bash ~/.config/waybar/scripts/rofi-bluetooth &",
+        "on-click": "blueman-manager",
         "on-click-right": "blueman-manager"
     },
 

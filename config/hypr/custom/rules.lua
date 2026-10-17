@@ -1,0 +1,2 @@
+-- Your own Hyprland rules. Riceforge never overwrites files in custom/.
+-- See ~/.config/hypr/hyprlua/rules.lua for the defaults this layer extends.

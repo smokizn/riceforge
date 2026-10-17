@@ -1,0 +1,10 @@
+# feature	default	description
+core	on	compositor, bar, notifications, lock, idle, terminal, audio, fonts (always installed)
+launcher	on	Walker + Elephant (AUR). Without it SUPER does nothing.
+shell	on	riceforge-shell: real Wi-Fi/Bluetooth panels, pairing agent, desk widgets, plate archive
+launcher-extras	on	Walker providers: files, calc, clipboard, symbols, web search, todo, bookmarks, windows (AUR)
+apps	on	colour/emoji pickers, btop, file manager, session menu, mpv
+aesthetic	on	Cormorant display serif and awww wallpaper crossfades
+personal	off	Discord, EasyEffects and Zen Browser, which the author's autostart/keybinds use
+display-manager	off	SDDM graphical login (only offered when no display manager is enabled)
+dev	off	tools for regenerating plates and icons, Lua syntax checks

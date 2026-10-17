@@ -1,173 +1,224 @@
-# riceforge
+# Riceforge
 
-Whole-desktop themes for this Hyprland setup, switchable and reversible.
-Themes: `original` (your desktop before riceforge), `etch`, `nacre` (active: **Visionary**).
+A complete, reproducible Hyprland desktop for Arch Linux, with switchable whole-desktop themes.
+The default theme, **NACRE · Visionary**, is a monochrome occult-astronomical engraving look:
+antique celestial plates under ink glass, parchment type, lunar silver, tarnished brass.
+Two more themes ship with it: **ETCH** (graphite plates, zinc greys) and **original**
+(the author's desktop before Riceforge).
 
-## Commands
+It's more than dotfiles. `./setup` installs the packages, enables the services the panels
+need, deploys the configs as symlinks into this repository, writes a machine-local layer for
+hardware differences, and checks the result. Everything it replaces is backed up, and
+`riceforge uninstall` reverses it.
 
-    ~/.config/riceforge/bin/riceforge list            # themes
-    ~/.config/riceforge/bin/riceforge status          # active theme + link health
-    ~/.config/riceforge/bin/riceforge verify nacre    # validate without applying
-    ~/.config/riceforge/bin/riceforge apply nacre     # verify, switch, live-reload, run session hooks
-    ~/.config/riceforge/bin/riceforge revert          # back to your pre-riceforge look
-    ~/.config/riceforge/bin/riceforge session-start   # (login) start the active theme's session
-    ~/.config/riceforge/bin/riceforge detach          # remove riceforge, restore plain files
+```bash
+git clone <REPOSITORY_URL> ~/riceforge
+cd ~/riceforge
+./setup
+```
 
-Re-applying the same theme after editing its Walker CSS: `RICEFORGE_RESTART_WALKER=1 riceforge apply nacre`.
+> Screenshots: none are committed yet. Add your own with
+> `grim docs/screenshots/desktop.png` and link them here.
+
+## What you get
+
+| Area | NACRE · Visionary |
+|---|---|
+| Compositor | Hyprland 0.56+ with a Lua config: spring-physics animations (windows unveil with 8 % overshoot, workspaces glide, scratchpads drop), engraved silver-brass focus line, blur on glass surfaces |
+| Bar | Waybar: sigil orb (opens Walker), constellation workspaces, engraved clock plaque with the real moon phase, CPU/RAM drawer, NetworkManager + BlueZ connection slab, volume/mic/brightness, battery vial |
+| Launcher | Walker + Elephant: manuscript header, prefixes for files `/`, calc `=`, clipboard `:`, symbols `.`, web `@`, todo `!`, bookmarks `%`, windows `$`, run `>` |
+| riceforge-shell | One resident GTK4 layer-shell process: **real Wi-Fi panel** (libnm: scan, connect PSK/SAE/WEP/open/OWE, wrong-password retry, hidden networks, forget), **real Bluetooth panel** (BlueZ D-Bus: pair, trust, connect, battery, and a default pairing agent), **plate archive** (wallpaper gallery with live preview and crossfades), **desk** (astrolabe with sunrise/sunset and moon phase, now-playing, battery, CPU/RAM) |
+| Notifications | SwayNC, themed |
+| Lock and idle | hyprlock (astrolabe ring, today's moon); hypridle locks after 5 min and turns screens off after 10 min |
+| Terminal | Kitty + fish with a native prompt that shows the moon's phase in the greeting |
+| Wallpapers | Eight distributable engraved plates in NACRE (public-domain sources plus procedural engraving), see [CREDITS.md](CREDITS.md) |
+
+Keys worth knowing: `SUPER` launcher · `SUPER+T` terminal · `SUPER+V` clipboard history ·
+`SUPER+L` lock · `SUPER+ALT+W` plate archive · `SUPER+ALT+N` Wi-Fi · `SUPER+ALT+B` Bluetooth ·
+`SUPER+ALT+M` lunar ephemeris · `SUPER+SHIFT+S` region screenshot · `SUPER+S` Spotify scratchpad.
+The full list is in `config/hypr/hyprlua/keybinds.lua`.
+
+## Before you start
+
+`./setup` does **not** install Arch Linux, partition disks, or touch the bootloader. You need:
+
+1. Arch Linux installed to disk and booted (the [installation guide](https://wiki.archlinux.org/title/Installation_guide),
+   or `archinstall` with the *minimal* profile). An Arch derivative may work; it is not tested.
+2. A normal user with `sudo` rights (`wheel` group), and that user logged in.
+3. A working network connection. If you set up networking with `iwd` or `systemd-networkd`,
+   Riceforge leaves it alone and tells you; the Wi-Fi panel needs NetworkManager.
+4. A GPU driver: Mesa for AMD/Intel is pulled in automatically. For NVIDIA install
+   `nvidia-open` (or `nvidia`) yourself first. Riceforge never installs or changes GPU drivers.
+5. `git`, to clone: `sudo pacman -S --needed git`.
+6. Optional: an AUR helper (`paru` or `yay`). Without one, setup offers to build one or skips the
+   AUR packages. AUR packages are Walker, Elephant and its providers, `hypremoji` and `wlogout`.
+
+x86_64 only for the full stack. On other architectures the AUR `-bin` packages are skipped.
+
+## Install
+
+```bash
+git clone <REPOSITORY_URL> ~/riceforge   # any location works
+cd ~/riceforge
+./setup --dry-run                         # optional: see the plan, change nothing
+./setup
+```
+
+Setup walks through:
+
+1. **Preflight.** Checks the distribution, architecture, sudo, disk space and network,
+   detects GPUs, battery, Bluetooth, the display manager and other network stacks, and
+   looks for an existing install. It refuses to run as root or on the live ISO.
+2. **Choices.** Hardware profile (detected), features, keyboard layout and theme. Defaults are
+   fine, and `--yes` accepts them all.
+3. **Plan.** Lists the missing packages, the services it would enable and every existing
+   file it will back up. Nothing changes until you confirm.
+4. **Packages.** Official packages go through `pacman -Syu --needed` (Arch doesn't support
+   partial upgrades, so your system is updated too). AUR packages go through your helper.
+   Packages you already have are skipped.
+5. **System.** Enables `NetworkManager` and `bluetooth` only if they're off and nothing
+   conflicts. Optionally enables SDDM if no display manager exists. Nothing else system-wide.
+6. **User config.** Links the repo to `~/.config/riceforge` (when cloned elsewhere), symlinks
+   every file in [`manifests/deploy.tsv`](manifests/deploy.tsv), seeds `~/.config/hypr/custom/`,
+   and writes `~/.config/riceforge-local/`.
+7. **Theme and check.** Applies NACRE and runs `riceforge doctor`.
+
+Then reboot, or log out, and pick **Hyprland (uwsm-managed)** at the login screen. Without
+a display manager, log in on a console and run `uwsm start hyprland.desktop`.
+
+Options: `--profile desktop|laptop|acer-nitro`, `--features +personal,-aesthetic`,
+`--theme etch`, `--kb-layout de`, `--aur-helper paru|yay|none`, `--no-packages`,
+`--no-system`, `--yes`, `--dry-run`. See `./setup --help`.
+
+### Features
+
+| feature | default | what it adds |
+|---|---|---|
+| core | always | Hyprland, hyprlock/idle, portals, polkit agent, Waybar, SwayNC, Kitty, fish, PipeWire, screenshots, fonts |
+| launcher | on | Walker + Elephant (AUR) |
+| shell | on | riceforge-shell dependencies: NetworkManager, BlueZ, UPower, gtk4-layer-shell, PyGObject/cairo |
+| launcher-extras | on | Elephant providers: files, calc, clipboard, symbols, web search, todo, bookmarks, windows (AUR) |
+| apps | on | hyprpicker, btop, Dolphin, hypremoji, wlogout, mpv |
+| aesthetic | on | Cormorant display serif, awww wallpaper crossfades |
+| personal | off | Discord, EasyEffects, Zen Browser autostart, the Discord workspace and FluxCap keys |
+| display-manager | off | SDDM, offered only when none is enabled |
+| dev | off | Pillow/NumPy for the plate generators, `luac` for tests |
+
+Every package, its purpose, source, tier and alternatives: [`manifests/packages.tsv`](manifests/packages.tsv),
+explained in [docs/DEPENDENCIES.md](docs/DEPENDENCIES.md).
+
+## Day to day
+
+```bash
+riceforge list | status          # themes; link health
+riceforge apply nacre|etch|original
+riceforge revert                 # = apply original
+riceforge verify etch            # check a theme without applying it
+riceforge doctor                 # packages, links, config syntax, services, duplicate helpers
+riceforge update                 # git pull --ff-only, redeploy, report new dependencies
+riceforge backups                # list backups; riceforge restore <stamp>
+riceforge uninstall [--dry-run]  # see below
+```
+
+`riceforge` lives in `~/.local/bin` (fish has that on `PATH`; for bash, add it).
+
+## Machine-specific settings
+
+Nothing machine-specific is tracked. Each computer gets `~/.config/riceforge-local/`:
+
+| file | what | written by |
+|---|---|---|
+| `machine.conf` | profile, features, keyboard layout, AUR helper | setup (rewritten each run) |
+| `hypr.lua` | monitors, input, GPU env, extras. Your lines are kept; only the `>>> riceforge` block is managed | setup (block only) |
+| `shell.toml` | astrolabe location (seeded from your timezone) | setup, once |
+
+Examples for `hypr.lua`:
+
+```lua
+hl.monitor({ output = "DP-1", mode = "2560x1440@144", position = "0x0", scale = 1 })
+hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = 1.25 })
+hl.config({ input = { kb_layout = "us,de", kb_options = "grp:alt_shift_toggle", sensitivity = -0.2 } })
+```
+
+Your own binds, rules and autostart go in `~/.config/hypr/custom/*.lua`. Setup seeds them
+once and never overwrites them. Kitty settings go in `~/.config/kitty/local.conf`. Hardware
+profiles, tested machines and limits are in [docs/HARDWARE.md](docs/HARDWARE.md).
 
 ## How it is wired
 
-`current -> themes/<name>`; these files in `~/.config` are symlinks through it:
-`hypr/riceforge.lua`, `hypr/hyprlock.conf`, `waybar/config.jsonc`, `waybar/style.css`,
-`kitty/riceforge-theme.conf`, `swaync/style.css`, `walker/themes/<name>`.
-`~/.config/fish/conf.d/riceforge.fish` sources `current/fish/theme.fish` when the theme has one.
+```
+~/riceforge (your clone)  ←─  ~/.config/riceforge           (symlink, if cloned elsewhere)
+  config/      base desktop  ←─  ~/.config/hypr/hyprland.lua, hyprlua/, kitty.conf, walker/config.toml, …
+  themes/<t>/  looks          ←─  current → themes/nacre  ←─  ~/.config/waybar/style.css, hyprlock.conf, …
+  shell/       riceforge-shell (started by the nacre theme's session hook)
+  manifests/   packages.tsv, features.tsv, deploy.tsv
+  install/     preflight, dependencies, system, user-config, validation, uninstall
+  profiles/    desktop, laptop, acer-nitro
+~/.config/riceforge-local/   this machine only (never tracked)
+~/.local/state/riceforge/    installed.tsv (what setup did), backups/<time>/, logs/
+```
 
-**Session hooks.** A theme may ship `themes/<t>/session` (start|stop) owning its long-running helpers.
-`apply` stops the old theme's session and starts the new one. `original` and `etch` run nm-applet,
-blueman-applet and swaybg; `nacre` runs riceforge-shell (and awww-daemon if installed) instead.
-At login `hyprlua/execs.lua` runs `riceforge session-start`; the applet/swaybg lines it replaced are
-kept, commented with `-- riceforge-session:`, and `detach` restores them verbatim (round trip tested).
+Hyprland loads: base `hyprlua/` → `custom/` → `monitors.lua` → `riceforge-local/hypr.lua`
+→ the theme layer (looks and motion only). Each theme may ship a `session` script
+(start|stop) that owns its long-running helpers: NACRE runs riceforge-shell and the wallpaper
+daemon, while ETCH and original run nm-applet, blueman-applet and swaybg. Login runs
+`riceforge session-start`, and `apply` stops the old theme's helpers before starting the
+new ones, so nothing runs twice.
 
-Edits outside riceforge (backed up in `backups/pre-visionary-2026-10-17.tar.gz`):
-- `hypr/hyprlua/execs.lua`: duplicate `swaync`, uninstalled `swayosd-server`/`hyprpaper`, and the racing
-  `systemctl --user restart elephant.service` commented out with reasons; `hypridle` added.
-- `hypr/hypridle.conf`: lock 5 min, screen off 10 min, no suspend; Lua-mode dpms dispatch
-  (`hyprctl dispatch 'hl.dsp.dpms({action = "off"})'`). The old config called a non-existent quickshell lock.
-- `hypr/custom/keybinds.lua`: four new binds (see Controls); previous file in `backups/custom-keybinds.lua.pre-visionary`.
+The plate archive remembers your wallpaper in `themes/<t>/wallpaper.png`. That file is
+local state, ignored by git, and repaired from the theme's `DEFAULT_WALLPAPER` if it goes missing.
 
-## NACRE · Visionary
+## Backups, recovery, uninstall
 
-An antique celestial instrument: engraved plates under ink glass, parchment type, lunar silver,
-tarnished brass for the sun, crimson only for critical states.
+- Every file setup replaces is moved to `~/.local/state/riceforge/backups/<time>/` with its
+  path intact. `riceforge restore <time>` puts one backup back.
+- `~/.local/state/riceforge/installed.tsv` records each link, seed, gsetting, enabled service
+  and installed package. Logs are in `~/.local/state/riceforge/logs/`.
+- If setup stops part-way, it says so and where the backups are. Re-running `./setup`
+  finishes the job because every step is idempotent.
+- `riceforge uninstall` removes only links that still point into Riceforge, restores what they
+  replaced, and resets the gsettings it changed. It keeps the repo, `riceforge-local`,
+  wallpapers, backups, files you edited, and the network and Bluetooth services (turning
+  those off could cut your connection). Add `--purge-seeds` to delete unedited seeded files,
+  or `--remove-packages` to also offer `pacman -Rns` for packages Riceforge installed.
+- Broken theme? `riceforge apply etch` or `riceforge revert`. Broken session? Switch to a TTY
+  (`Ctrl+Alt+F3`), log in, and run `riceforge uninstall` or `riceforge apply original`.
 
-| token | hex | role |
-|---|---|---|
-| ink / charcoal / graphite | `#0b0a0a` `#151413` `#2a2826` | grounds, glass |
-| stone | `#6e6a64` | quiet text, empty states |
-| lunar silver | `#b9bcc2` | rules, borders, moon |
-| bone / parchment | `#e6dfcf` `#d6cbb2` | text |
-| tarnished brass | `#b39a5e` | sun, active, primary actions |
-| crimson | `#a8464f` | critical only |
+## Troubleshooting
 
-Type: Cormorant / Cormorant SC (display; falls back to Noto Serif), Adwaita Sans (UI),
-Iosevka Nerd Font Mono (terminal). Icons: 65 hand-authored hairline SVGs in 6 colours
-(`themes/nacre/icons`, built by `tools/build_icons.py`).
-
-**Hyprland** (`themes/nacre/hypr.lua`): silver-brass engraved focus line, rounding 14, blur on windows
-and per-layer (bar, notifications, shell panels), real spring physics:
-unveil ζ.62 (windows open, 8% overshoot, ~510 ms), glide ζ.74 (workspaces), wobble ζ.68 (moves),
-drop ζ.60 (scratchpads), pop ζ.65 (layers); closing uses a swell-then-melt bezier.
-
-**Waybar**: sigil orb (Walker) + constellation workspaces (stars on a hairline, brass = active);
-engraved clock plaque with the moon's real phase (click: ephemeris); instruments drawer;
-connections slab (NetworkManager `network` + `bluetooth`, clicks open the panels); senses; battery vial.
-
-**Walker**: manuscript header (sun · INVOCATIO · moon, prefix hints), serif search line,
-brass margin rule on the selected entry, provider tags (file, calc, clip, symbol, glyph, mark, pkg).
-
-**riceforge-shell** (`shell/`, one resident GTK4 + gtk4-layer-shell process, session bus only):
-- **Wi-Fi panel**: libnm async + NM signals; scan with in-flight guard and NM rate-limit handling;
-  APs deduplicated by SSID with signal/security/band; connect (saved or new, PSK/SAE/WEP/open/OWE),
-  success only on NM `ACTIVATED`, 45 s timeout, failure reasons from the device state reason,
-  wrong-password prompt that updates the saved key, a failed new profile is deleted; disconnect,
-  radio toggle, saved networks (autoconnect, forget with confirm), hidden networks.
-  Passwords go straight into NM settings (system-stored); never logged or written by this code.
-  802.1X/enterprise: use nm-connection-editor.
-- **Bluetooth panel**: BlueZ D-Bus model fed by InterfacesAdded/Removed + PropertiesChanged and a name
-  watch; power, discovery (auto-stops after 30 s), Connected/Paired/Nearby, battery, RSSI, trust;
-  pair (45 s, CancelPairing on timeout), connect/disconnect, forget (two-click confirm), mapped errors.
-  **Pairing agent** (`org.bluez.Agent1`, KeyboardDisplay, default agent while nacre is active): passkey
-  confirmation, PIN/passkey entry, service authorization with "Always allow" (sets Trusted). It only
-  answers calls whose sender is bluetoothd's own bus name.
-- **Plate archive** (SUPER+ALT+W): plates + `~/Pictures/Wallpapers`; arrows to browse, Space previews on the
-  desktop, Enter sets, Esc reverts; metadata and attribution; unreadable files are marked and skipped.
-  Backend: awww crossfade if installed, else a flash-free swaybg swap (instant). Choice persists in
-  `themes/nacre/wallpaper.png` (also used by hyprlock); a missing plate falls back to the first good one.
-- **Desk** (bottom-right, BOTTOM layer): astrolabe (24 h dial, daylight arc from NOAA sunrise/sunset,
-  brass sun / silver moon hand, the real moon phase) and an instrument strip (Wi-Fi, Bluetooth,
-  battery via UPower, now playing via MPRIS with play/pause, CPU/RAM from /proc, current plate).
-  Click the dial for the lunar ephemeris. Location: `shell/config.toml` (default: New Delhi, from your timezone).
-- **Kitty / fish / swaync / hyprlock**: same palette; fish greeting shows the moon's phase; hyprlock shows an
-  engraved astrolabe ring with today's moon and nothing private.
-
-## Controls
-
-| key / click | action |
+| symptom | try |
 |---|---|
-| SUPER+ALT+W | plate archive (wallpapers) |
-| SUPER+ALT+N, click Wi-Fi in the bar or desk | Wi-Fi panel |
-| SUPER+ALT+B, click Bluetooth in the bar or desk | Bluetooth panel |
-| SUPER+ALT+M, click the moon or the astrolabe | lunar ephemeris |
-| Esc / clicking elsewhere | close a panel |
+| anything | `riceforge doctor` first; it names missing packages, dangling links, config errors, duplicated helpers |
+| SUPER does nothing | Walker/Elephant are AUR packages: `riceforge doctor`; `pgrep -a elephant` |
+| Wi-Fi/Bluetooth panel empty | `systemctl status NetworkManager bluetooth`; panels only run under NACRE |
+| a key fires twice | doctor reports duplicate binds; check `~/.config/hypr/custom/keybinds.lua` |
+| Hyprland config error banner | `Hyprland --verify-config -c ~/.config/hypr/hyprland.lua` |
+| display serif looks plain | install `otf-cormorant` (feature `aesthetic`) |
+| wrong sunrise times | set `[location]` in `~/.config/riceforge-local/shell.toml`, then `riceforge-shell quit; riceforge session-start` |
+| fan icons missing | expected unless the Acer `linuwu_sense` driver is installed (see HARDWARE.md) |
 
-The binds only act while riceforge-shell runs (nacre); under other themes they do nothing.
-`~/.config/riceforge/shell/riceforge-shell status` prints the live state as JSON.
+## Development and tests
 
-## Wallpapers
+```bash
+tests/run.sh                 # all safe suites
+tests/clean-container.sh     # fresh Arch container + real pacman (needs docker; ~1.5 GB)
+```
 
-Generated at 1920×1080 by `themes/nacre/tools/plates/compose.py` (sources fetched by `sources.py`,
-licence checked against Commons metadata; `sources/sources.json` keeps the records).
+The safe suites run in a throwaway copy of the repo with a fake `$HOME`, mocked
+`pacman`/`sudo`/`systemctl`/`gsettings`, and no Hyprland session variables. Session-helper
+tests run in a private PID namespace. None of them touch the live desktop, services,
+packages or network. Coverage includes manifest consistency (every command the configs run
+must map to a package), syntax of JSON, Lua, Python, shell and TOML, permissions, absolute
+`/home` paths and private data, install/rerun/uninstall/restore, theme switching, wallpaper
+repair, process duplication, profiles, timezone location and missing optional packages.
+Hardware tests that really disconnect Wi-Fi or Bluetooth are opt-in:
+`shell/tests/test_disruptive.py`.
 
-| plate | made from |
-|---|---|
-| I · Machina Mundi | Flammarion engraving (anonymous, 1888), public domain + procedural orbit diagram |
-| II · Anatomia Montium | Vesalius, *Tertia musculorum tabula* (1543), NLM via Commons, "no restrictions" + procedural mountains |
-| III · Ouroboros Eclipsis | procedural |
-| IV · Montes Lunae | procedural |
-| V · Oculus Mundi | procedural |
-| VI · The Empyrean | Gustave Doré, *Paradiso* Canto 31, public domain |
-| VII · Macrocosmus | Robert Fludd, *Utriusque Cosmi* (1617–21), public domain |
-| VIII · Selenographia | James Nasmyth, *Normal lunar crater* (1874), public domain |
-| IX–XI · Fenestra, Draco, Trigonum | re-prints of your own wallpapers |
+What was verified, and on what, is listed in [docs/HARDWARE.md](docs/HARDWARE.md#what-was-tested).
 
-Commons pages: see `themes/nacre/tools/plates/sources/sources.json`. No image-generation model was used;
-"procedural" means drawn by the Python engraving code. Your originals in `~/Pictures/Wallpapers` are untouched.
+## Credits and licence
 
-## What was tested, and how
-
-Verified on the running desktop (2026-10-17):
-- `Hyprland --verify-config`, GTK3/GTK4 CSS parsing, kitty's own config loader, `fish --no-execute`,
-  `py_compile`, every icon SVG rendered, Waybar launched with the theme (no config errors).
-- `shell/tests/test_logic.py`: 45 checks incl. moon phases against four real eclipse/phase events
-  (all within 2 minutes), sunrise/sunset, Wi-Fi security classification, dedup, error mapping.
-- `shell/tests/test_live.py` (non-disruptive): real AP list, accepted scan with advancing `last_scan`,
-  BlueZ discovery start → Discovering true → stop.
-- `shell/tests/test_disruptive.py`, run with your consent: Wi-Fi disconnect + reconnect of my-network through the
-  panel's `Attempt` (ACTIVATED after 3.2 s); Tronsmart speaker disconnect + reconnect through
-  `BtState.device_op` (BlueZ reported Connected again).
-- Theme switching nacre → etch → original → nacre three times: exactly one of each helper per theme
-  (applets only outside nacre, riceforge-shell only in nacre), no config errors, pairing agent re-registered
-  as default; fish/kitty scoping confirmed.
-- riceforge-shell idle: 0.42 % of one core over 60 s, 83 MB RSS (cairo renderer).
-
-Not tested (checklist):
-- [ ] Lock screen: press SUPER+L once (hyprlock has no dry-run; keys were checked against the binary).
-- [ ] Walker's new look: press SUPER (it takes keyboard focus, so it wasn't opened during the work).
-- [ ] Pairing a new device and the agent's passkey prompt (needs a device in pairing mode).
-- [ ] An incoming connection from the untrusted speaker (should ask; "Always allow" marks it trusted).
-- [ ] Connecting a new secured network and a wrong-password attempt (only on a network you own).
-- [ ] realme Buds connect attempt.
-- [ ] Gallery keyboard navigation (tested only in a focus-free test mode).
-
-## Known limitations
-
-- No real refraction or window deformation: blur, tint and spring-driven scale/position only.
-  There is no fullscreen-specific animation leaf in Hyprland 0.56; fullscreen uses move/fade.
-- swaybg cannot crossfade; install `awww` for crossfades (the session switches to it automatically).
-- Cormorant isn't installed yet: display type falls back to Noto Serif until you run
-  `sudo pacman -S otf-cormorant awww`, then `riceforge apply nacre` and re-run
-  `themes/nacre/tools/plates/compose.py themes/nacre/wallpapers` for Cormorant captions.
-- The desk surface receives clicks in its own rectangle on an empty desktop (windows always cover it).
-- Moon/sun times are computed locally (minutes of accuracy); the fish greeting uses a ±half-day approximation.
-- `less` is not installed, so git's pager fails in the terminal (`git --no-pager …` works).
-
-## Recovery
-
-- Switch away: `riceforge apply etch` / `riceforge revert` (original).
-- The previous liquid-glass nacre: `git -C ~/.config/riceforge checkout nacre-glass -- themes/nacre`.
-- Remove everything riceforge did: `riceforge detach`, then `rm ~/.config/fish/conf.d/riceforge.fish`.
-- Full restore of the configs as they were before Visionary:
-  `tar xzf ~/.config/riceforge/backups/pre-visionary-2026-10-17.tar.gz -C ~/.config`
-- Original pre-riceforge snapshot: `backups/pre-riceforge-2026-10-17.tar.gz`.
-- If riceforge-shell misbehaves: `riceforge-shell quit` (unregisters the pairing agent); `riceforge revert`
-  brings back nm-applet and blueman-applet.
+Riceforge's own code is MIT ([LICENSE](LICENSE)). The Walker theme directories are derived from
+Walker's default theme and are GPL-3.0 (see `themes/*/walker/NOTICE`). The plates use public-domain
+engravings by Flammarion (anonymous), Vesalius, Doré, Fludd and Nasmyth, and fonts come from
+Arch packages under their own licences. Full list: [CREDITS.md](CREDITS.md).
